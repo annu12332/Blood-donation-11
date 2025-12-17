@@ -50,7 +50,7 @@ const CreateDonationRequest = () => {
 
       if (res.data.insertedId) {
         toast.success("Donation Request Created Successfully!");
-        navigate("/dashboard/my-donation-requests"); // সাকসেস হলে এখানে পাঠাবে
+        navigate("/dashboard/my-donation-requests"); 
       }
     } catch (err) {
       console.error(err);

@@ -4,15 +4,17 @@ import Home from "../src/pages/Home";
 import Login from "../src/pages/Login";
 import Signup from "../src/pages/Signup";
 import DashboardLayout from "../src/layouts/DashboardLayout";
-import DashboardHome from "../src/layouts/DashboardHome";
-import PrivateRoute from "../routes/PrivateRoute"; 
+import DashboardHome from "../src/layouts/DashboardHome"; 
+import PrivateRoute from "../routes/PrivateRoute";
 import Profile from "../src/pages/Profile";
+import MyDonationRequests from "../src/components/dashboard/MyDonationRequests";
+import CreateDonationRequest from "../src/components/dashboard/CreateDonationRequest";
+import EditDonationRequest from "../src/components/dashboard/EditDonationRequest";
 
 let router = createBrowserRouter([
-  
   {
     path: "/",
-    element: <Root></Root>,
+    element: <Root />,
     children: [
       {
         path: "/",
@@ -38,14 +40,25 @@ let router = createBrowserRouter([
     ),
     children: [
       {
-        index: true, 
+        index: true,
         element: <DashboardHome />,
       },
       {
         path: "profile",
-        element: <Profile/>,
+        element: <Profile />,
       },
-      
+      {
+        path: "my-donation-requests",
+        element: <MyDonationRequests />,
+      },
+      {
+        path: "create-donation-request", 
+        element: <CreateDonationRequest />,
+      },
+      {
+        path: "edit-request/:id",
+        element: <EditDonationRequest />,
+      },
     ],
   },
 ]);
