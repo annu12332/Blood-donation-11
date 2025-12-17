@@ -1,45 +1,64 @@
-import { NavLink, Outlet } from "react-router-dom";
-import { FaHome, FaUser, FaPlusCircle, FaList } from "react-icons/fa";
+import { useState } from "react";
+import { NavLink, useNavigate } from "react-router";
+import { useAuth } from "../provider/AuthProvider";
+import { FaUser, FaHome, FaSignOutAlt, FaBars, FaTimes, FaPlusCircle, FaList } from "react-icons/fa";
 
-const DashboardLayout = () => {
-    
-    const role = "donor"; 
+const Sidebar = () => {
+  const { logOut, user } = useAuth();
+  const [isActive, setActive] = useState(false);
+  const navigate = useNavigate();
 
-    return (
-        <div className="flex min-h-screen">
-            {/* Sidebar */}
-            <div className="w-64 bg-blue-900 text-white p-5 space-y-4">
-                <h2 className="text-2xl font-bold mb-10">Dashboard</h2>
-                
-                <nav className="flex flex-col gap-2">
-                    <NavLink to="/dashboard" end className={({ isActive }) => isActive ? "bg-blue-700 p-2 rounded" : "p-2 hover:bg-blue-800 rounded flex items-center gap-2"}>
-                        <FaHome /> Dashboard Home
-                    </NavLink>
-                    
-                    <NavLink to="/dashboard/profile" className={({ isActive }) => isActive ? "bg-blue-700 p-2 rounded" : "p-2 hover:bg-blue-800 rounded flex items-center gap-2"}>
-                        <FaUser /> Profile
-                    </NavLink>
+  const handleToggle = () => setActive(!isActive);
 
-                    
-                    {role === "donor" && (
-                        <>
-                            <NavLink to="/dashboard/my-donation-requests" className="p-2 hover:bg-blue-800 rounded flex items-center gap-2">
-                                <FaList /> My Requests
-                            </NavLink>
-                            <NavLink to="/dashboard/create-donation-request" className="p-2 hover:bg-blue-800 rounded flex items-center gap-2">
-                                <FaPlusCircle /> Create Request
-                            </NavLink>
-                        </>
-                    )}
-                </nav>
-            </div>
+  const handleLogOut = () => {
+    logOut();
+    navigate("/");
+  };
 
-            
-            <div className="flex-1 bg-gray-100 p-10">
-                <Outlet />
-            </div>
+  return (
+    <>
+      {/* Mobile Screen Navbar */}
+      <div className="bg-blue-900 text-white flex justify-between md:hidden p-4">
+        <div className="font-bold">Blood Donation</div>
+        <button onClick={handleToggle} className="p-2 focus:outline-none">
+          {isActive ? <FaTimes /> : <FaBars />}
+        </button>
+      </div>
+
+      {/* Sidebar Content */}
+      <div className={`z-10 md:fixed flex flex-col justify-between overflow-x-hidden bg-blue-900 w-64 space-y-6 px-2 py-4 absolute inset-y-0 left-0 transform ${isActive && "-translate-x-full"} md:translate-x-0 transition duration-200 ease-in-out`}>
+        <div>
+          <h2 className="text-2xl font-bold text-center text-white mb-8 border-b pb-4">Dashboard</h2>
+          
+          <nav>
+            <NavLink to="/dashboard" end className={({ isActive }) => `flex items-center px-4 py-2 mt-2 transition-colors duration-300 transform rounded-lg hover:bg-blue-700 text-white ${isActive ? "bg-blue-700" : ""}`}>
+              <FaHome className="w-5 h-5" />
+              <span className="mx-4 font-medium">Welcome Home</span>
+            </NavLink>
+
+            <NavLink to="/dashboard/profile" className={({ isActive }) => `flex items-center px-4 py-2 mt-2 transition-colors duration-300 transform rounded-lg hover:bg-blue-700 text-white ${isActive ? "bg-blue-700" : ""}`}>
+              <FaUser className="w-5 h-5" />
+              <span className="mx-4 font-medium">Profile</span>
+            </NavLink>
+
+            {/* Donor Routes (এগুলো পরে ডাইনামিক করব) */}
+            <NavLink to="/dashboard/my-donation-requests" className="flex items-center px-4 py-2 mt-2 text-white hover:bg-blue-700 rounded-lg">
+              <FaList className="w-5 h-5" />
+              <span className="mx-4 font-medium">My Requests</span>
+            </NavLink>
+          </nav>
         </div>
-    );
+
+        <div>
+          <hr className="border-blue-700" />
+          <button onClick={handleLogOut} className="flex w-full items-center px-4 py-2 mt-5 text-red-300 hover:bg-red-800 transition-colors duration-300 rounded-lg">
+            <FaSignOutAlt className="w-5 h-5" />
+            <span className="mx-4 font-medium">Logout</span>
+          </button>
+        </div>
+      </div>
+    </>
+  );
 };
 
-export default DashboardLayout;
+export default Sidebar;

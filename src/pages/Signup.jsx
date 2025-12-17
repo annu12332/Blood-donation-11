@@ -23,7 +23,7 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
- 
+  // ১. জেলা ও উপজেলা ডাটা লোড করা
   useEffect(() => {
     fetch("/districts.json") 
       .then((res) => res.json())

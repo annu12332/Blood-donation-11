@@ -4,9 +4,9 @@ import Home from "../src/pages/Home";
 import Login from "../src/pages/Login";
 import Signup from "../src/pages/Signup";
 import DashboardLayout from "../src/layouts/DashboardLayout";
-import DashboardHome from "../src/pages/Dashboard/DashboardHome";
-import PrivateRoute from "../src/routes/PrivateRoute"; 
-import Profile from "../src/pages/Dashboard/Profile";
+import DashboardHome from "../src/layouts/DashboardHome";
+import PrivateRoute from "../routes/PrivateRoute"; 
+import Profile from "../src/pages/Profile";
 
 let router = createBrowserRouter([
   
@@ -43,7 +43,7 @@ let router = createBrowserRouter([
       },
       {
         path: "profile",
-        element: <Profile />,
+        element: <Profile/>,
       },
       
     ],
