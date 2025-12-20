@@ -6,6 +6,7 @@ import Signup from "../src/pages/Signup";
 import DashboardLayout from "../src/layouts/DashboardLayout";
 import DashboardHome from "../src/layouts/DashboardHome";
 import PrivateRoute from "../routes/PrivateRoute";
+import AdminRoute from "./AdminRoute"; 
 import Profile from "../src/pages/Profile";
 import MyDonationRequests from "../src/components/dashboard/MyDonationRequests";
 import CreateDonationRequest from "../src/components/dashboard/CreateDonationRequest";
@@ -44,7 +45,6 @@ let router = createBrowserRouter([
       },
     ],
   },
-
   {
     path: "/dashboard",
     element: (
@@ -75,9 +75,9 @@ let router = createBrowserRouter([
       },
       {
         path: "all-users",
-        element: <AllUsers />,
+        
+        element: <AdminRoute><AllUsers /></AdminRoute>, 
       },
-
       {
         path: "content-management",
         element: <ContentManagement />,
@@ -88,12 +88,8 @@ let router = createBrowserRouter([
       },
       {
         path: "donation-details/:id",
-        element: <PrivateRoute><DonationDetails /></PrivateRoute>,
+        element: <DonationDetails />,
       },
-      {
-        path: ""
-      }
-
     ],
   },
 ]);
