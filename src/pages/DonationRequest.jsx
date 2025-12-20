@@ -7,7 +7,7 @@ const DonationRequests = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // সব পেন্ডিং রিকোয়েস্ট নিয়ে আসা
+        
         axios.get('http://localhost:3000/all-donation-requests')
             .then(res => {
                 setRequests(res.data);

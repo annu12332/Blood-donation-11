@@ -1,135 +1,111 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../provider/AuthProvider";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import { Link } from "react-router";
+import { FaEye, FaEdit, FaTrashAlt } from "react-icons/fa";
+import Swal from "sweetalert2";
 
-const EditDonationRequest = () => {
-    const { id } = useParams(); 
-    const { user } = useAuth();
-    const navigate = useNavigate();
+const MyDonationRequests = () => {
+  const { user } = useAuth();
+  const [requests, setRequests] = useState([]);
 
-    const [requestData, setRequestData] = useState({});
-    const [districts, setDistricts] = useState([]);
-    const [upazilas, setUpazilas] = useState([]);
-    const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    if (user?.email) {
+      fetchRequests();
+    }
+  }, [user?.email]);
 
+  const fetchRequests = async () => {
+    try {
+      const res = await axios.get(`http://localhost:3000/donation-requests/${user.email}`);
+      setRequests(res.data);
+    } catch (err) {
+      console.error("Error fetching requests:", err);
+    }
+  };
 
-    useEffect(() => {
-        
-        fetch("/districts.json").then(res => res.json()).then(data => setDistricts(data));
-        fetch("/upazilas.json").then(res => res.json()).then(data => setUpazilas(data));
-
-        
-        axios.get(`http://localhost:3000/donation-request-details/${id}`)
-            .then(res => {
-                setRequestData(res.data);
-                setLoading(false);
-            })
-            .catch(err => {
-                toast.error("Error loading data");
-                setLoading(false);
-            });
-    }, [id]);
-
-    const handleUpdate = async (e) => {
-        e.preventDefault();
-        const form = e.target;
-
-        const updatedInfo = {
-            recipientName: form.recipientName.value,
-            recipientDistrict: form.district.value,
-            recipientUpazila: form.upazila.value,
-            hospitalName: form.hospitalName.value,
-            fullAddress: form.fullAddress.value,
-            donationDate: form.donationDate.value,
-            donationTime: form.donationTime.value,
-            requestMessage: form.requestMessage.value,
-        };
-
+  const handleDelete = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
         try {
-            const res = await axios.patch(`http://localhost:3000/donation-requests/${id}`, updatedInfo);
-            if (res.data.modifiedCount > 0) {
-                toast.success("Request Updated Successfully! 🎉");
-                navigate("/dashboard/my-donation-requests");
-            }
+          const res = await axios.delete(`http://localhost:3000/donation-requests/${id}`);
+          if (res.data.deletedCount > 0) {
+            Swal.fire("Deleted!", "Your request has been deleted.", "success");
+            setRequests(requests.filter((req) => req._id !== id));
+          }
         } catch (err) {
-            toast.error("Failed to update request.");
+          Swal.fire("Error!", "Failed to delete.", "error");
         }
-    };
+      }
+    });
+  };
 
-    if (loading) return <div className="text-center mt-10">Loading...</div>;
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-sm border">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">My Donation Requests</h2>
 
-    return (
-        <div className="bg-white p-8 rounded-2xl shadow-sm border max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-green-700 text-center mb-8">Update Donation Request</h2>
-
-            <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <div className="form-control">
-                    <label className="label font-semibold">Requester Name</label>
-                    <input type="text" value={user?.displayName} readOnly className="input input-bordered bg-gray-100" />
-                </div>
-                <div className="form-control">
-                    <label className="label font-semibold">Requester Email</label>
-                    <input type="email" value={user?.email} readOnly className="input input-bordered bg-gray-100" />
-                </div>
-
-              
-                <div className="form-control">
-                    <label className="label font-semibold">Recipient Name</label>
-                    <input name="recipientName" type="text" defaultValue={requestData.recipientName} className="input input-bordered" required />
-                </div>
-
-                <div className="form-control">
-                    <label className="label font-semibold">Hospital Name</label>
-                    <input name="hospitalName" type="text" defaultValue={requestData.hospitalName} className="input input-bordered" required />
-                </div>
-
-                <div className="form-control">
-                    <label className="label font-semibold">District</label>
-                    <select name="district" className="select select-bordered" defaultValue={requestData.recipientDistrict} required>
-                        <option value="">Select District</option>
-                        {districts.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
-                    </select>
-                </div>
-
-                <div className="form-control">
-                    <label className="label font-semibold">Upazila</label>
-                    <select name="upazila" className="select select-bordered" defaultValue={requestData.recipientUpazila} required>
-                        <option value="">Select Upazila</option>
-                        {upazilas.map(u => <option key={u.id} value={u.name}>{u.name}</option>)}
-                    </select>
-                </div>
-
-                <div className="form-control">
-                    <label className="label font-semibold">Donation Date</label>
-                    <input name="donationDate" type="date" defaultValue={requestData.donationDate} className="input input-bordered" required />
-                </div>
-
-                <div className="form-control">
-                    <label className="label font-semibold">Donation Time</label>
-                    <input name="donationTime" type="time" defaultValue={requestData.donationTime} className="input input-bordered" required />
-                </div>
-
-                <div className="form-control md:col-span-2">
-                    <label className="label font-semibold">Full Address Line</label>
-                    <input name="fullAddress" type="text" defaultValue={requestData.fullAddress} className="input input-bordered" required />
-                </div>
-
-                <div className="form-control md:col-span-2">
-                    <label className="label font-semibold">Request Message</label>
-                    <textarea name="requestMessage" defaultValue={requestData.requestMessage} className="textarea textarea-bordered h-24" required></textarea>
-                </div>
-
-                <div className="md:col-span-2 mt-4">
-                    <button type="submit" className="btn w-full bg-green-600 hover:bg-green-700 text-white border-none text-lg">
-                        Update Request
-                    </button>
-                </div>
-            </form>
-        </div>
-    );
+      <div className="overflow-x-auto">
+        <table className="table w-full">
+          <thead className="bg-gray-50">
+            <tr>
+              <th>Recipient</th>
+              <th>Location</th>
+              <th>Date & Time</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {requests.length > 0 ? (
+              requests.map((request) => (
+                <tr key={request._id} className="hover:bg-gray-50 border-t">
+                  <td className="font-medium">{request.recipientName}</td>
+                  <td className="text-sm">{request.district}, {request.upazila}</td>
+                  <td className="text-sm">{request.donationDate} <br /> {request.donationTime}</td>
+                  <td>
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
+                      request.status === "pending" ? "bg-yellow-100 text-yellow-700" :
+                      request.status === "inprogress" ? "bg-blue-100 text-blue-700" :
+                      "bg-green-100 text-green-700"
+                    }`}>
+                      {request.status}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="flex gap-4">
+                      <Link title="View" to={`/dashboard/donation-details/${request._id}`}>
+                        <FaEye className="text-blue-500 cursor-pointer hover:scale-120 transition" />
+                      </Link>
+                      <Link title="Edit" to={`/dashboard/edit-request/${request._id}`}>
+                        <FaEdit className="text-green-500 cursor-pointer hover:scale-120 transition" />
+                      </Link>
+                      <button onClick={() => handleDelete(request._id)} title="Delete">
+                        <FaTrashAlt className="text-red-500 cursor-pointer hover:scale-120 transition" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center py-10 text-gray-400">
+                  No donation requests found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 };
 
-export default EditDonationRequest;
+export default MyDonationRequests;

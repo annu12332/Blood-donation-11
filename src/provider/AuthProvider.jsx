@@ -11,77 +11,63 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../firebase/Firebase.config";
 
 export const AuthContext = createContext(null);
-
 const googleProvider = new GoogleAuthProvider();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const registerWithEmailPassword = async (email, pass) => {
+  // ১. রেজিস্ট্রেশন
+  const registerWithEmailPassword = (email, pass) => {
     setLoading(true);
-    try {
-      return await createUserWithEmailAndPassword(auth, email, pass);
-    } finally {
-      setLoading(false);
-    }
+    return createUserWithEmailAndPassword(auth, email, pass);
   };
 
-  const loginWithEmailPassword = async (email, pass) => {
+  // ২. লগইন
+  const loginWithEmailPassword = (email, pass) => {
     setLoading(true);
-    try {
-      return await signInWithEmailAndPassword(auth, email, pass);
-    } finally {
-      setLoading(false);
-    }
+    return signInWithEmailAndPassword(auth, email, pass);
   };
 
-  const googleLogin = async () => {
+  // ৩. গুগল লগইন
+  const googleLogin = () => {
     setLoading(true);
-    try {
-      return await signInWithPopup(auth, googleProvider);
-    } finally {
-      setLoading(false);
-    }
+    return signInWithPopup(auth, googleProvider);
   };
 
-  const logout = async () => {
+  // ৪. প্রোফাইল আপডেট (নাম এবং ফটো)
+  const updateUserProfile = (name, photo) => {
     setLoading(true);
-    try {
-      await signOut(auth);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
+    return firebaseUpdateProfile(auth.currentUser, {
+      displayName: name,
+      photoURL: photo,
+    });
   };
 
-  const updateProfile = async (profileData) => {
+  // ৫. লগআউট
+  const logout = () => {
     setLoading(true);
-    try {
-      if (!auth.currentUser) throw new Error("No user is logged in");
-      await firebaseUpdateProfile(auth.currentUser, profileData);
-      setUser({ ...auth.currentUser });
-    } finally {
-      setLoading(false);
-    }
+    return signOut(auth);
   };
 
+  // ৬. ইউজার স্টেট পর্যবেক্ষণ
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
     });
-    return unsubscribe;
+    return () => unsubscribe();
   }, []);
 
   const authData = {
     user,
     loading,
+    setLoading,
     registerWithEmailPassword,
     loginWithEmailPassword,
     googleLogin,
     logout,
-    updateProfile,
+    updateUserProfile, // নাম আপডেট করে দিলাম যাতে আপনার সাইনআপের সাথে মিলে
   };
 
   return (

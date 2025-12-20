@@ -23,7 +23,7 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // ১. জেলা ও উপজেলা ডাটা লোড করা
+
   useEffect(() => {
     fetch("/districts.json") 
       .then((res) => res.json())
@@ -75,7 +75,7 @@ const Signup = () => {
           status: "active", 
         };
 
-        const dbRes = await axios.post('http://localhost:3000/users', userInfo);
+        const dbRes = await axios.post('http://localhost:5000/users', userInfo);
 
         if(dbRes.data.insertedId){
             console.log("User saved to database");

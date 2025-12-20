@@ -1,31 +1,29 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../provider/AuthProvider";
 import axios from "axios";
 import { Link } from "react-router";
-import { FaEdit, FaTrashAlt, FaEye } from "react-icons/fa";
-import Swal from "sweetalert2"; 
-import { toast } from "react-hot-toast";
+import { FaEye, FaEdit, FaTrashAlt } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 const MyDonationRequests = () => {
   const { user } = useAuth();
   const [requests, setRequests] = useState([]);
-  const [filterStatus, setFilterStatus] = useState("");
 
-  
-  const fetchRequests = () => {
+  useEffect(() => {
     if (user?.email) {
-      axios
-        .get(`http://localhost:3000/donation-requests/${user.email}`)
-        .then((res) => setRequests(res.data))
-        .catch((err) => console.error(err));
+      fetchRequests();
+    }
+  }, [user?.email]);
+
+  const fetchRequests = async () => {
+    try {
+      const res = await axios.get(`http://localhost:3000/donation-requests/${user.email}`);
+      setRequests(res.data);
+    } catch (err) {
+      console.error("Error fetching requests:", err);
     }
   };
 
-  useEffect(() => {
-    fetchRequests();
-  }, [user?.email]);
-
-  
   const handleDelete = (id) => {
     Swal.fire({
       title: "Are you sure?",
@@ -40,90 +38,57 @@ const MyDonationRequests = () => {
         try {
           const res = await axios.delete(`http://localhost:3000/donation-requests/${id}`);
           if (res.data.deletedCount > 0) {
-            toast.success("Request deleted successfully!");
-            fetchRequests(); 
+            Swal.fire("Deleted!", "Your request has been deleted.", "success");
+            setRequests(requests.filter((req) => req._id !== id));
           }
         } catch (err) {
-          toast.error("Failed to delete.");
+          Swal.fire("Error!", "Failed to delete.", "error");
         }
       }
     });
   };
 
-  
-  const filteredRequests = filterStatus 
-    ? requests.filter(req => req.status === filterStatus) 
-    : requests;
-
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border min-h-screen">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        <h2 className="text-2xl font-bold text-gray-800">My Donation Requests</h2>
-        
-       
-        <div className="flex items-center gap-2">
-          <span className="font-medium text-gray-600">Filter by Status:</span>
-          <select 
-            className="select select-bordered select-sm"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="">All</option>
-            <option value="pending">Pending</option>
-            <option value="inprogress">In Progress</option>
-            <option value="done">Done</option>
-            <option value="canceled">Canceled</option>
-          </select>
-        </div>
-      </div>
+    <div className="bg-white p-6 rounded-2xl shadow-sm border">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">My Donation Requests</h2>
 
       <div className="overflow-x-auto">
         <table className="table w-full">
-          <thead className="bg-gray-100">
+          <thead className="bg-gray-50">
             <tr>
-              <th className="p-4">Recipient Name</th>
-              <th className="p-4">Location</th>
-              <th className="p-4">Date & Time</th>
-              <th className="p-4">Status</th>
-              <th className="p-4 text-center">Actions</th>
+              <th>Recipient</th>
+              <th>Location</th>
+              <th>Date & Time</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredRequests.length > 0 ? (
-              filteredRequests.map((request) => (
-                <tr key={request._id} className="border-t hover:bg-gray-50 transition">
-                  <td className="p-4 font-semibold text-gray-700">{request.recipientName}</td>
-                  <td className="p-4 text-sm">
-                    {request.recipientDistrict}, {request.recipientUpazila}
-                  </td>
-                  <td className="p-4 text-sm">
-                    {request.donationDate} | {request.donationTime}
-                  </td>
-                  <td className="p-4">
+            {requests.length > 0 ? (
+              requests.map((request) => (
+                <tr key={request._id} className="hover:bg-gray-50 border-t">
+                  <td className="font-medium">{request.recipientName}</td>
+                  <td className="text-sm">{request.district}, {request.upazila}</td>
+                  <td className="text-sm">{request.donationDate} <br /> {request.donationTime}</td>
+                  <td>
                     <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
                       request.status === "pending" ? "bg-yellow-100 text-yellow-700" :
                       request.status === "inprogress" ? "bg-blue-100 text-blue-700" :
-                      request.status === "done" ? "bg-green-100 text-green-700" :
-                      "bg-red-100 text-red-700"
+                      "bg-green-100 text-green-700"
                     }`}>
                       {request.status}
                     </span>
                   </td>
-                  <td className="p-4">
-                    <div className="flex justify-center gap-4 text-lg">
-                      {/* View Button */}
-                      <Link to={`/dashboard/request-details/${request._id}`} title="View Details">
-                        <FaEye className="text-blue-500 hover:text-blue-700 cursor-pointer" />
+                  <td>
+                    <div className="flex gap-4">
+                      <Link title="View" to={`/dashboard/donation-details/${request._id}`}>
+                        <FaEye className="text-blue-500 cursor-pointer hover:scale-120 transition" />
                       </Link>
-                      
-                      {/* Edit Button */}
-                      <Link to={`/dashboard/edit-request/${request._id}`} title="Edit Request">
-                        <FaEdit className="text-green-500 hover:text-green-700 cursor-pointer" />
+                      <Link title="Edit" to={`/dashboard/edit-request/${request._id}`}>
+                        <FaEdit className="text-green-500 cursor-pointer hover:scale-120 transition" />
                       </Link>
-
-                      {/* Delete Button */}
-                      <button onClick={() => handleDelete(request._id)} title="Delete Request">
-                        <FaTrashAlt className="text-red-500 hover:text-red-700 cursor-pointer" />
+                      <button onClick={() => handleDelete(request._id)} title="Delete">
+                        <FaTrashAlt className="text-red-500 cursor-pointer hover:scale-120 transition" />
                       </button>
                     </div>
                   </td>
@@ -131,8 +96,8 @@ const MyDonationRequests = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="text-center py-20 text-gray-400">
-                  No donation requests found for this status.
+                <td colSpan="5" className="text-center py-10 text-gray-400">
+                  No donation requests found.
                 </td>
               </tr>
             )}
