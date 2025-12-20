@@ -1,89 +1,83 @@
-import { useQuery } from "@tanstack/react-query"; 
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import Swal from "sweetalert2";
 
 const AllUsers = () => {
-    // ইউজারের ডাটা লোড করা
+    
     const { data: users = [], refetch } = useQuery({
-        queryKey: ['users'],
+        queryKey: ["users"],
         queryFn: async () => {
-            const res = await axios.get('http://localhost:5000/users');
+            const res = await axios.get("http://localhost:5000/users");
             return res.data;
-        }
+        },
     });
 
-    // রোল পরিবর্তন ফাংশন
-    const handleRoleChange = async (user, newRole) => {
-        const res = await axios.patch(`http://localhost:3000/users/role/${user._id}`, { role: newRole });
+    
+    const handleRoleChange = async (id, newRole) => {
+        const res = await axios.patch(`http://localhost:5000/users/role/${id}`, { role: newRole });
         if (res.data.modifiedCount > 0) {
-            toast.success(`${user.name} is now a ${newRole}`);
             refetch();
+            Swal.fire("Success", `User is now a ${newRole}`, "success");
         }
     };
 
-    // স্ট্যাটাস পরিবর্তন ফাংশন 
-    const handleStatusChange = async (user, newStatus) => {
-        const res = await axios.patch(`http://localhost:3000/users/status/${user._id}`, { status: newStatus });
+   
+    const handleStatusChange = async (id, newStatus) => {
+        const res = await axios.patch(`http://localhost:5000/users/status/${id}`, { status: newStatus });
         if (res.data.modifiedCount > 0) {
-            toast.success(`User is now ${newStatus}`);
             refetch();
+            Swal.fire("Updated", `User status is now ${newStatus}`, "success");
         }
     };
 
     return (
-        <div className="bg-white p-6 rounded-xl shadow-md">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">Total Users: {users.length}</h2>
-            <div className="overflow-x-auto">
-                <table className="table w-full border">
-                    <thead className="bg-blue-100">
-                        <tr>
-                            <th>Avatar</th>
-                            <th>Email & Name</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+        <div className="p-6">
+            <h2 className="text-3xl font-bold mb-6 text-blue-900">All Users: {users.length}</h2>
+            
+            <div className="overflow-x-auto bg-white rounded-lg shadow-md">
+                <table className="table w-full border-collapse">
+                    <thead>
+                        <tr className="bg-blue-100 text-blue-900">
+                            <th className="p-3 text-left">Avatar</th>
+                            <th className="p-3 text-left">Email</th>
+                            <th className="p-3 text-left">Name</th>
+                            <th className="p-3 text-left">Role</th>
+                            <th className="p-3 text-left">Status</th>
+                            <th className="p-3 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map(user => (
-                            <tr key={user._id}>
-                                <td>
-                                    <div className="avatar">
-                                        <div className="mask mask-squircle w-12 h-12">
-                                            <img src={user.image} alt="Avatar" />
-                                        </div>
-                                    </div>
+                        {users.map((user) => (
+                            <tr key={user._id} className="border-b hover:bg-gray-50">
+                                <td className="p-3">
+                                    <img src={user.avatar} alt="avatar" className="w-10 h-10 rounded-full border" />
                                 </td>
-                                <td>
-                                    <div className="font-bold">{user.name}</div>
-                                    <div className="text-sm opacity-50">{user.email}</div>
-                                </td>
-                                <td className="capitalize font-medium">{user.role}</td>
-                                <td>
-                                    <span className={`badge ${user.status === 'active' ? 'badge-success' : 'badge-error text-white'}`}>
+                                <td className="p-3">{user.email}</td>
+                                <td className="p-3">{user.name}</td>
+                                <td className="p-3 capitalize">{user.role}</td>
+                                <td className="p-3">
+                                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${user.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                         {user.status}
                                     </span>
                                 </td>
-                                <td>
-                                    <div className="flex gap-2">
-                                        {/* রোল চেঞ্জ ড্রপডাউন বা বাটন */}
-                                        <select 
-                                            onChange={(e) => handleRoleChange(user, e.target.value)}
-                                            className="select select-bordered select-xs"
-                                            defaultValue={user.role}
-                                        >
-                                            <option value="donor">Donor</option>
-                                            <option value="volunteer">Volunteer</option>
-                                            <option value="admin">Admin</option>
-                                        </select>
+                                <td className="p-3 flex justify-center gap-2">
+                                    {/* Role Management */}
+                                    <select 
+                                        onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                                        className="select select-bordered select-sm"
+                                        defaultValue={user.role}
+                                    >
+                                        <option value="donor">Donor</option>
+                                        <option value="volunteer">Volunteer</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
 
-                                        {/* ব্লক/আনব্লক বাটন */}
-                                        {user.status === 'active' ? (
-                                            <button onClick={() => handleStatusChange(user, 'blocked')} className="btn btn-xs btn-error text-white">Block</button>
-                                        ) : (
-                                            <button onClick={() => handleStatusChange(user, 'active')} className="btn btn-xs btn-success text-white">Unblock</button>
-                                        )}
-                                    </div>
+                                    {/* Status Management */}
+                                    {user.status === 'active' ? (
+                                        <button onClick={() => handleStatusChange(user._id, 'blocked')} className="btn btn-sm btn-error text-white">Block</button>
+                                    ) : (
+                                        <button onClick={() => handleStatusChange(user._id, 'active')} className="btn btn-sm btn-success text-white">Unblock</button>
+                                    )}
                                 </td>
                             </tr>
                         ))}
