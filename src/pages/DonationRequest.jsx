@@ -8,7 +8,7 @@ const DonationRequests = () => {
 
     useEffect(() => {
         
-        axios.get('http://localhost:3000/all-donation-requests')
+        axios.get('http://localhost:5000/all-donation-requests')
             .then(res => {
                 setRequests(res.data);
                 setLoading(false);
@@ -47,7 +47,7 @@ const DonationRequests = () => {
                                     
                                     <div className="space-y-3 text-gray-700">
                                         <p className="flex items-center gap-2">
-                                            <span className="font-bold">📍 Location:</span> {request.recipientUpazila}, {request.recipientDistrict}
+                                            <span className="font-bold">📍 Location:</span> {request.upazila}, {request.district}
                                         </p>
                                         <p className="flex items-center gap-2">
                                             <span className="font-bold">📅 Date:</span> {request.donationDate}

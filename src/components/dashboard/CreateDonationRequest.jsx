@@ -27,7 +27,7 @@ const CreateDonationRequest = () => {
     };
 
     try {
-      const res = await axios.post("http://localhost:3000/donation-requests", requestData);
+      const res = await axios.post("http://localhost:5000/donation-requests", requestData);
       if (res.data.insertedId) {
         toast.success("Donation request created successfully!");
         navigate("/dashboard/my-donation-requests");
@@ -42,7 +42,7 @@ const CreateDonationRequest = () => {
       <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Create Blood Donation Request</h2>
       
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Requester Info (Read Only) */}
+       
         <div className="form-control">
           <label className="label font-semibold">Requester Name</label>
           <input type="text" value={user?.displayName} readOnly className="input input-bordered bg-gray-100" />
@@ -61,7 +61,7 @@ const CreateDonationRequest = () => {
         <div className="form-control">
           <label className="label font-semibold text-red-600">Blood Group *</label>
           <select name="bloodGroup" className="select select-bordered" required>
-            <option disabled selected>Select Blood Group</option>
+            <option value= "" disabled selected>Select Blood Group</option>
             <option value="A+">A+</option>
             <option value="A-">A-</option>
             <option value="B+">B+</option>
