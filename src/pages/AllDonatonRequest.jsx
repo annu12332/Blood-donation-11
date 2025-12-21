@@ -1,111 +1,44 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-import Swal from "sweetalert2";
+import useAxiosSecure from "../hooks/useAxiosSecure"; 
 import { Link } from "react-router";
 
-const AllDonationRequests = () => {
+const DonationRequests = () => {
     const [requests, setRequests] = useState([]);
-    const [filter, setFilter] = useState("");
+    const axiosSecure = useAxiosSecure();
 
     useEffect(() => {
-        fetchData();
-    }, []);
-
-    const fetchData = async () => {
-        try {
-            const res = await axios.get("http://localhost:5000/all-donation-requests");
-            setRequests(res.data);
-        } catch (error) {
-            console.error("Error fetching requests:", error);
-        }
-    };
-
-    // স্ট্যাটাস ফিল্টার করা ডাটা
-    const filteredRequests = filter
-        ? requests.filter(req => req.status === filter)
-        : requests;
+        axiosSecure.get("/all-donation-requests")
+            .then(res => {
+                setRequests(res.data);
+            })
+            .catch(error => {
+                console.error("Error fetching requests:", error);
+            });
+    }, [axiosSecure]);
 
     return (
-        <div className="bg-white p-8 rounded-xl shadow-lg min-h-screen">
-            <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                <h2 className="text-3xl font-extrabold text-gray-800">All Donation Requests</h2>
-
-                {/* Filter Dropdown */}
-                <div className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-600">Filter by Status:</span>
-                    <select
-                        className="select select-bordered select-sm focus:ring-2 focus:ring-red-500"
-                        value={filter}
-                        onChange={(e) => setFilter(e.target.value)}
-                    >
-                        <option value="">All</option>
-                        <option value="pending">Pending</option>
-                        <option value="inprogress">In Progress</option>
-                        <option value="done">Done</option>
-                        <option value="canceled">Canceled</option>
-                    </select>
-                </div>
+        <div className="container mx-auto p-6">
+            <h2 className="text-2xl font-bold mb-4">Donation Requests</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {requests.map(request => (
+                    <div key={request._id} className="card bg-base-100 shadow-xl border">
+                        <div className="card-body">
+                            <h2 className="card-title text-red-600">{request.recipientName}</h2>
+                            <p><strong>Blood Group:</strong> {request.bloodGroup}</p>
+                            <p><strong>Location:</strong> {request.recipientDistrict}, {request.recipientUpazila}</p>
+                            <p><strong>Date:</strong> {request.donationDate}</p>
+                            <div className="card-actions justify-end mt-4">
+                                <Link to={`/donation-details/${request._id}`} className="btn btn-error btn-sm text-white">
+                                    View Details
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
-
-            <div className="overflow-x-auto border rounded-lg">
-                <table className="table table-zebra w-full">
-                    <thead className="bg-red-50 text-red-700">
-                        <tr>
-                            <th>Recipient</th>
-                            <th>Location</th>
-                            <th>Date & Time</th>
-                            <th>Status</th>
-                            <th>Requester</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredRequests.length > 0 ? (
-                            filteredRequests.map((req) => (
-                                <tr key={req._id} className="hover:bg-gray-50 transition-colors">
-                                    <td>
-                                        <div className="font-bold">{req.recipientName}</div>
-                                        <div className="text-xs opacity-60">Group: {req.bloodGroup}</div>
-                                    </td>
-                                    <td className="text-sm">
-                                        {req.recipientUpazila}, {req.recipientDistrict}
-                                    </td>
-                                    <td className="text-sm">
-                                        {req.donationDate} <br />
-                                        <span className="text-xs text-gray-500">{req.donationTime}</span>
-                                    </td>
-                                    <td>
-                                        <span className={`badge badge-sm font-bold uppercase ${req.status === 'pending' ? 'badge-warning' :
-                                                req.status === 'inprogress' ? 'badge-info' :
-                                                    req.status === 'done' ? 'badge-success' : 'badge-ghost'
-                                            }`}>
-                                            {req.status}
-                                        </span>
-                                    </td>
-                                    <td className="text-sm">
-                                        <div className="font-medium">{req.requesterName}</div>
-                                        <div className="text-xs text-gray-400">{req.requesterEmail}</div>
-                                    </td>
-                                    <td>
-                                        <button className="btn btn-xs btn-outline btn-error"><Link
-                                            to={`/dashboard/update-donation-request/${req._id}`}
-                                            className="btn btn-xs btn-outline btn-error"
-                                        >
-                                            Manage
-                                        </Link></button>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="6" className="text-center py-10 text-gray-400">No requests found.</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+            {requests.length === 0 && <p className="text-center text-gray-500">No donation requests available.</p>}
         </div>
     );
 };
 
-export default AllDonationRequests;
+export default DonationRequests;

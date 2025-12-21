@@ -3,6 +3,7 @@ import { Link } from "react-router"; // Link ইম্পোর্ট করত�
 import axios from "axios";
 import Banner from "../components/Banner";
 import ContactUs from "../components/ContactUs";
+import Footer from "../components/Footer";
 
 const Home = () => {
     const [blogs, setBlogs] = useState([]);
@@ -71,6 +72,7 @@ const Home = () => {
             )}
 
             <ContactUs />
+            <Footer/>
         </div>
     );
 };

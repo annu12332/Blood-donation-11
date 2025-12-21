@@ -1,29 +1,28 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import Swal from "sweetalert2";
+import useAxiosSecure from "../hooks/useAxiosSecure"; 
 
 const AllUsers = () => {
+    const axiosSecure = useAxiosSecure(); 
     
     const { data: users = [], refetch } = useQuery({
         queryKey: ["users"],
         queryFn: async () => {
-            const res = await axios.get("http://localhost:5000/users");
+            const res = await axiosSecure.get("/users");
             return res.data;
         },
     });
 
-    
     const handleRoleChange = async (id, newRole) => {
-        const res = await axios.patch(`http://localhost:5000/users/role/${id}`, { role: newRole });
+        const res = await axiosSecure.patch(`/users/role/${id}`, { role: newRole });
         if (res.data.modifiedCount > 0) {
             refetch();
             Swal.fire("Success", `User is now a ${newRole}`, "success");
         }
     };
 
-   
     const handleStatusChange = async (id, newStatus) => {
-        const res = await axios.patch(`http://localhost:5000/users/status/${id}`, { status: newStatus });
+        const res = await axiosSecure.patch(`/users/status/${id}`, { status: newStatus });
         if (res.data.modifiedCount > 0) {
             refetch();
             Swal.fire("Updated", `User status is now ${newStatus}`, "success");
@@ -32,52 +31,61 @@ const AllUsers = () => {
 
     return (
         <div className="p-6">
-            <h2 className="text-3xl font-bold mb-6 text-blue-900">All Users: {users.length}</h2>
+            <h2 className="text-3xl font-bold mb-6 text-blue-900">Total Users: {users.length}</h2>
             
-            <div className="overflow-x-auto bg-white rounded-lg shadow-md">
-                <table className="table w-full border-collapse">
+            <div className="overflow-x-auto bg-white rounded-lg shadow-md border border-gray-200">
+                <table className="table w-full">
+                    {/* Head */}
                     <thead>
-                        <tr className="bg-blue-100 text-blue-900">
-                            <th className="p-3 text-left">Avatar</th>
-                            <th className="p-3 text-left">Email</th>
-                            <th className="p-3 text-left">Name</th>
-                            <th className="p-3 text-left">Role</th>
-                            <th className="p-3 text-left">Status</th>
-                            <th className="p-3 text-center">Actions</th>
+                        <tr className="bg-gray-100 text-gray-700">
+                            <th>Avatar</th>
+                            <th>Info</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th className="text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {users.map((user) => (
-                            <tr key={user._id} className="border-b hover:bg-gray-50">
-                                <td className="p-3">
-                                    <img src={user.avatar} alt="avatar" className="w-10 h-10 rounded-full border" />
+                            <tr key={user._id} className="hover:bg-gray-50">
+                                <td>
+                                    <div className="avatar">
+                                        <div className="mask mask-squircle w-12 h-12">
+                                            <img src={user.avatar} alt="Avatar" />
+                                        </div>
+                                    </div>
                                 </td>
-                                <td className="p-3">{user.email}</td>
-                                <td className="p-3">{user.name}</td>
-                                <td className="p-3 capitalize">{user.role}</td>
-                                <td className="p-3">
-                                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${user.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                <td>
+                                    <div className="font-bold">{user.name}</div>
+                                    <div className="text-sm opacity-50">{user.email}</div>
+                                </td>
+                                <td className="capitalize">
+                                    <span className="badge badge-ghost font-semibold">{user.role}</span>
+                                </td>
+                                <td>
+                                    <span className={`badge border-none text-white ${user.status === 'active' ? 'bg-green-500' : 'bg-red-500'}`}>
                                         {user.status}
                                     </span>
                                 </td>
-                                <td className="p-3 flex justify-center gap-2">
-                                    {/* Role Management */}
-                                    <select 
-                                        onChange={(e) => handleRoleChange(user._id, e.target.value)}
-                                        className="select select-bordered select-sm"
-                                        defaultValue={user.role}
-                                    >
-                                        <option value="donor">Donor</option>
-                                        <option value="volunteer">Volunteer</option>
-                                        <option value="admin">Admin</option>
-                                    </select>
+                                <td>
+                                    <div className="flex justify-center items-center gap-3">
+                                        <select 
+                                            onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                                            className="select select-bordered select-xs w-full max-w-[120px]"
+                                            defaultValue={user.role}
+                                        >
+                                            <option value="donor">Donor</option>
+                                            <option value="volunteer">Volunteer</option>
+                                            <option value="admin">Admin</option>
+                                        </select>
 
-                                    {/* Status Management */}
-                                    {user.status === 'active' ? (
-                                        <button onClick={() => handleStatusChange(user._id, 'blocked')} className="btn btn-sm btn-error text-white">Block</button>
-                                    ) : (
-                                        <button onClick={() => handleStatusChange(user._id, 'active')} className="btn btn-sm btn-success text-white">Unblock</button>
-                                    )}
+                                        <button 
+                                            onClick={() => handleStatusChange(user._id, user.status === 'active' ? 'blocked' : 'active')} 
+                                            className={`btn btn-xs ${user.status === 'active' ? 'btn-error' : 'btn-success'} text-white w-20`}
+                                        >
+                                            {user.status === 'active' ? 'Block' : 'Unblock'}
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}

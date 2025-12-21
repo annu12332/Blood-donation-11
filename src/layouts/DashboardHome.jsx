@@ -1,44 +1,64 @@
 import { useAuth } from "../provider/AuthProvider";
 import useRole from "../hooks/UseRole";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import useAxiosSecure from "../hooks/useAxiosSecure"; // axios এর বদলে এটি ব্যবহার হবে
 import { Link } from "react-router";
 import { FaEye, FaEdit, FaTrashAlt, FaUsers, FaHandHoldingHeart, FaCheckCircle } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 const DashboardHome = () => {
     const { user } = useAuth();
     const [role] = useRole();
+    const axiosSecure = useAxiosSecure(); 
     const [recentRequests, setRecentRequests] = useState([]);
-    // স্ট্যাটাস ডাটা রাখার জন্য স্টেট
     const [stats, setStats] = useState({ users: 0, requests: 0, doneDonations: 0 });
 
     useEffect(() => {
-        // ১. ডোনারের জন্য রিসেন্ট রিকোয়েস্ট আনা
+        // ১. ডোনারের জন্য রিসেন্ট রিকোয়েস্ট আনা
         if (user?.email && role === "donor") {
-            axios
-                .get(`http://localhost:5000/donation-requests/recent/${user.email}`)
+            axiosSecure
+                .get(`/donation-requests/recent/${user.email}`)
                 .then((res) => setRecentRequests(res.data))
                 .catch((err) => console.error("Error fetching recent requests:", err));
         }
 
-        // ২. এডমিন বা ভলান্টিয়ারের জন্য ডাইনামিক স্ট্যাটাস আনা
+        // ২. এডমিন বা ভলান্টিয়ারের জন্য স্ট্যাটাস আনা
         if (role === "admin" || role === "volunteer") {
-            axios
-                .get('http://localhost:5000/admin-stats')
+            axiosSecure
+                .get('/admin-stats')
                 .then((res) => setStats(res.data))
                 .catch((err) => console.error("Error fetching stats:", err));
         }
-    }, [user?.email, role]);
+    }, [user?.email, role, axiosSecure]);
+
+    // ডিলিট ফাংশনালিটি (ঐচ্ছিক কিন্তু ড্যাশবোর্ডের জন্য প্রয়োজন)
+    const handleDelete = (id) => {
+        Swal.fire({
+            title: "Are you sure?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const res = await axiosSecure.delete(`/donation-requests/${id}`);
+                if (res.data.deletedCount > 0) {
+                    setRecentRequests(recentRequests.filter(req => req._id !== id));
+                    Swal.fire("Deleted!", "Request has been deleted.", "success");
+                }
+            }
+        });
+    };
 
     return (
         <div className="space-y-8 p-4">
             {/* Welcome Header */}
-            <div className="bg-white p-8 rounded-2xl shadow-sm border-l-8 border-blue-600">
+            <div className="bg-white p-8 rounded-2xl shadow-sm border-l-8 border-red-600">
                 <h1 className="text-3xl font-bold text-gray-800">
-                    Welcome, <span className="text-blue-600">{user?.displayName}</span>! 👋
+                    Welcome, <span className="text-red-600">{user?.displayName}</span>! 👋
                 </h1>
-                <p className="text-gray-500 mt-2">
-                    Your role: <span className="badge badge-secondary capitalize">{role}</span>
+                <p className="text-gray-500 mt-2 font-medium">
+                    Role: <span className="badge badge-error text-white capitalize px-4">{role}</span>
                 </p>
             </div>
 
@@ -46,51 +66,50 @@ const DashboardHome = () => {
             {role === "donor" && (
                 <div className="bg-white p-6 rounded-2xl shadow-sm border">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-bold text-gray-700">Recent Donation Requests</h2>
-                        {recentRequests.length > 0 && (
-                            <Link to="/dashboard/my-donation-requests" className="text-blue-600 hover:underline font-medium text-sm">
-                                View All Requests
-                            </Link>
-                        )}
+                        <h2 className="text-xl font-bold text-gray-700">My Recent Requests</h2>
+                        <Link to="/dashboard/my-donation-requests" className="btn btn-sm btn-outline btn-error">
+                            View All
+                        </Link>
                     </div>
 
                     <div className="overflow-x-auto">
                         <table className="table w-full">
-                            <thead className="bg-gray-50">
-                                <tr className="text-gray-600">
-                                    <th className="p-4">Recipient</th>
+                            <thead className="bg-gray-50 text-gray-700">
+                                <tr>
+                                    <th>Recipient</th>
                                     <th>Location</th>
                                     <th>Date & Time</th>
                                     <th>Status</th>
-                                    <th>Action</th>
+                                    <th className="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {recentRequests.length > 0 ? (
                                     recentRequests.map((request) => (
-                                        <tr key={request._id} className="border-t hover:bg-gray-50 transition">
-                                            <td className="p-4 font-bold">{request.recipientName}</td>
-                                            <td className="text-sm">{request.district}, {request.upazila}</td>
+                                        <tr key={request._id} className="hover:bg-gray-50 transition">
+                                            <td className="font-bold">{request.recipientName}</td>
+                                            <td className="text-sm">{request.recipientDistrict}, {request.recipientUpazila}</td>
                                             <td className="text-sm">{request.donationDate} <br /> {request.donationTime}</td>
                                             <td>
-                                                <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${
-                                                    request.status === "pending" ? "bg-yellow-100 text-yellow-700" :
-                                                    request.status === "inprogress" ? "bg-blue-100 text-blue-700" :
-                                                    "bg-green-100 text-green-700"
+                                                <span className={`badge badge-sm font-bold uppercase ${
+                                                    request.status === "pending" ? "badge-warning" :
+                                                    request.status === "inprogress" ? "badge-info" : "badge-success"
                                                 }`}>
                                                     {request.status}
                                                 </span>
                                             </td>
-                                            <td className="flex gap-4 p-4 text-lg">
-                                                <Link to={`/dashboard/request-details/${request._id}`}><FaEye className="text-blue-500 hover:scale-125 transition" /></Link>
-                                                <Link to={`/dashboard/edit-request/${request._id}`}><FaEdit className="text-green-500 hover:scale-125 transition" /></Link>
-                                                <button><FaTrashAlt className="text-red-500 hover:scale-125 transition" /></button>
+                                            <td>
+                                                <div className="flex justify-center gap-4 text-lg">
+                                                    <Link title="View" to={`/donation-details/${request._id}`}><FaEye className="text-blue-500 hover:scale-110" /></Link>
+                                                    <Link title="Edit" to={`/dashboard/update-donation-request/${request._id}`}><FaEdit className="text-green-500 hover:scale-110" /></Link>
+                                                    <button title="Delete" onClick={() => handleDelete(request._id)}><FaTrashAlt className="text-red-500 hover:scale-110" /></button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="5" className="text-center py-10 text-gray-400">No requests found.</td>
+                                        <td colSpan="5" className="text-center py-10 text-gray-400 font-medium">No recent requests found.</td>
                                     </tr>
                                 )}
                             </tbody>
@@ -102,26 +121,26 @@ const DashboardHome = () => {
             {/* Admin/Volunteer View: Dynamic Stats Cards */}
             {(role === "admin" || role === "volunteer") && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-white p-8 rounded-2xl border border-red-100 shadow-sm flex items-center justify-between">
+                    <div className="bg-white p-8 rounded-2xl border-b-4 border-red-500 shadow-md flex items-center justify-between">
                         <div>
-                            <h3 className="text-gray-500 text-sm font-bold uppercase tracking-wider">Total Donors</h3>
-                            <p className="text-4xl font-black text-red-600 mt-1">{stats.users}</p>
+                            <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest">Total Donors</h3>
+                            <p className="text-4xl font-black text-gray-800 mt-1">{stats.users}</p>
                         </div>
                         <FaUsers className="text-5xl text-red-100" />
                     </div>
 
-                    <div className="bg-white p-8 rounded-2xl border border-blue-100 shadow-sm flex items-center justify-between">
+                    <div className="bg-white p-8 rounded-2xl border-b-4 border-blue-500 shadow-md flex items-center justify-between">
                         <div>
-                            <h3 className="text-gray-500 text-sm font-bold uppercase tracking-wider">Total Requests</h3>
-                            <p className="text-4xl font-black text-blue-600 mt-1">{stats.requests}</p>
+                            <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest">Total Requests</h3>
+                            <p className="text-4xl font-black text-gray-800 mt-1">{stats.requests}</p>
                         </div>
                         <FaHandHoldingHeart className="text-5xl text-blue-100" />
                     </div>
 
-                    <div className="bg-white p-8 rounded-2xl border border-green-100 shadow-sm flex items-center justify-between">
+                    <div className="bg-white p-8 rounded-2xl border-b-4 border-green-500 shadow-md flex items-center justify-between">
                         <div>
-                            <h3 className="text-gray-500 text-sm font-bold uppercase tracking-wider">Blood Collected</h3>
-                            <p className="text-4xl font-black text-green-600 mt-1">{stats.doneDonations}</p>
+                            <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest">Successful Donations</h3>
+                            <p className="text-4xl font-black text-gray-800 mt-1">{stats.doneDonations}</p>
                         </div>
                         <FaCheckCircle className="text-5xl text-green-100" />
                     </div>
