@@ -43,6 +43,10 @@ let router = createBrowserRouter([
         path: "/donation-requests",
         element: <DonationRequests />,
       },
+      {
+        path: "donation-details/:id",
+        element: <DonationDetails />,
+      },
     ],
   },
   {
@@ -86,10 +90,7 @@ let router = createBrowserRouter([
         path: "content-management/add-blog",
         element: <AddBlog />,
       },
-      {
-        path: "donation-details/:id",
-        element: <DonationDetails />,
-      },
+      
     ],
   },
 ]);
