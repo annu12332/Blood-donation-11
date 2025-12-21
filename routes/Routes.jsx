@@ -17,6 +17,9 @@ import AddBlog from "../src/pages/AddBlog";
 import Search from "../src/pages/Search";
 import DonationDetails from "../src/pages/DonationDetails";
 import DonationRequests from "../src/pages/DonationRequest";
+import AdminHome from "../src/pages/AdminHome";
+import Blog from "../src/pages/Blog";
+import AllDonationRequests from "../src/pages/AllDonatonRequest";
 
 let router = createBrowserRouter([
   {
@@ -47,6 +50,10 @@ let router = createBrowserRouter([
         path: "donation-details/:id",
         element: <DonationDetails />,
       },
+      {
+        path: "/blog",
+        element: <Blog/>
+      }
     ],
   },
   {
@@ -90,6 +97,10 @@ let router = createBrowserRouter([
         path: "content-management/add-blog",
         element: <AddBlog />,
       },
+      {
+            path: "all-blood-donation-request", 
+            element: <AllDonationRequests /> 
+        },
       
     ],
   },
