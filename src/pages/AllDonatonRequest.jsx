@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { Link } from "react-router";
 
 const AllDonationRequests = () => {
     const [requests, setRequests] = useState([]);
-    const [filter, setFilter] = useState(""); 
+    const [filter, setFilter] = useState("");
 
     useEffect(() => {
         fetchData();
@@ -20,19 +21,19 @@ const AllDonationRequests = () => {
     };
 
     // স্ট্যাটাস ফিল্টার করা ডাটা
-    const filteredRequests = filter 
-        ? requests.filter(req => req.status === filter) 
+    const filteredRequests = filter
+        ? requests.filter(req => req.status === filter)
         : requests;
 
     return (
         <div className="bg-white p-8 rounded-xl shadow-lg min-h-screen">
             <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                 <h2 className="text-3xl font-extrabold text-gray-800">All Donation Requests</h2>
-                
+
                 {/* Filter Dropdown */}
                 <div className="flex items-center gap-2">
                     <span className="font-semibold text-gray-600">Filter by Status:</span>
-                    <select 
+                    <select
                         className="select select-bordered select-sm focus:ring-2 focus:ring-red-500"
                         value={filter}
                         onChange={(e) => setFilter(e.target.value)}
@@ -70,15 +71,14 @@ const AllDonationRequests = () => {
                                         {req.recipientUpazila}, {req.recipientDistrict}
                                     </td>
                                     <td className="text-sm">
-                                        {req.donationDate} <br /> 
+                                        {req.donationDate} <br />
                                         <span className="text-xs text-gray-500">{req.donationTime}</span>
                                     </td>
                                     <td>
-                                        <span className={`badge badge-sm font-bold uppercase ${
-                                            req.status === 'pending' ? 'badge-warning' : 
-                                            req.status === 'inprogress' ? 'badge-info' : 
-                                            req.status === 'done' ? 'badge-success' : 'badge-ghost'
-                                        }`}>
+                                        <span className={`badge badge-sm font-bold uppercase ${req.status === 'pending' ? 'badge-warning' :
+                                                req.status === 'inprogress' ? 'badge-info' :
+                                                    req.status === 'done' ? 'badge-success' : 'badge-ghost'
+                                            }`}>
                                             {req.status}
                                         </span>
                                     </td>
@@ -87,7 +87,12 @@ const AllDonationRequests = () => {
                                         <div className="text-xs text-gray-400">{req.requesterEmail}</div>
                                     </td>
                                     <td>
-                                        <button className="btn btn-xs btn-outline btn-error">Manage</button>
+                                        <button className="btn btn-xs btn-outline btn-error"><Link
+                                            to={`/dashboard/update-donation-request/${req._id}`}
+                                            className="btn btn-xs btn-outline btn-error"
+                                        >
+                                            Manage
+                                        </Link></button>
                                     </td>
                                 </tr>
                             ))

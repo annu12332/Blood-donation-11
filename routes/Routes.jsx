@@ -6,7 +6,7 @@ import Signup from "../src/pages/Signup";
 import DashboardLayout from "../src/layouts/DashboardLayout";
 import DashboardHome from "../src/layouts/DashboardHome";
 import PrivateRoute from "../routes/PrivateRoute";
-import AdminRoute from "./AdminRoute"; 
+import AdminRoute from "./AdminRoute";
 import Profile from "../src/pages/Profile";
 import MyDonationRequests from "../src/components/dashboard/MyDonationRequests";
 import CreateDonationRequest from "../src/components/dashboard/CreateDonationRequest";
@@ -20,6 +20,7 @@ import DonationRequests from "../src/pages/DonationRequest";
 import AdminHome from "../src/pages/AdminHome";
 import Blog from "../src/pages/Blog";
 import AllDonationRequests from "../src/pages/AllDonatonRequest";
+import UpdateDonationRequest from "../src/pages/UpdateDonationRequest";
 
 let router = createBrowserRouter([
   {
@@ -52,7 +53,7 @@ let router = createBrowserRouter([
       },
       {
         path: "/blog",
-        element: <Blog/>
+        element: <Blog />
       }
     ],
   },
@@ -86,8 +87,8 @@ let router = createBrowserRouter([
       },
       {
         path: "all-users",
-        
-        element: <AdminRoute><AllUsers /></AdminRoute>, 
+
+        element: <AdminRoute><AllUsers /></AdminRoute>,
       },
       {
         path: "content-management",
@@ -98,10 +99,14 @@ let router = createBrowserRouter([
         element: <AddBlog />,
       },
       {
-            path: "all-blood-donation-request", 
-            element: <AllDonationRequests /> 
-        },
-      
+        path: "all-blood-donation-request",
+        element: <AllDonationRequests />
+      },
+      {
+        path: "update-donation-request/:id",
+        element: <UpdateDonationRequest /> 
+      }
+
     ],
   },
 ]);
