@@ -21,6 +21,7 @@ import AdminHome from "../src/pages/AdminHome";
 import Blog from "../src/pages/Blog";
 import AllDonationRequests from "../src/pages/AllDonatonRequest";
 import UpdateDonationRequest from "../src/pages/UpdateDonationRequest";
+import Funding from "../src/pages/Funding";
 
 let router = createBrowserRouter([
   {
@@ -104,7 +105,11 @@ let router = createBrowserRouter([
       },
       {
         path: "update-donation-request/:id",
-        element: <UpdateDonationRequest /> 
+        element: <UpdateDonationRequest />
+      },
+      {
+        path: 'funding',
+        element: <Funding></Funding>
       }
 
     ],

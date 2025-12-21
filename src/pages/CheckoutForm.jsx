@@ -1,7 +1,7 @@
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useEffect, useState } from "react";
-import useAxiosSecure from "../../hooks/useAxiosSecure";
-import { useAuth } from "../../provider/AuthProvider";
+import useAxiosSecure from "../hooks/useAxiosSecure";
+import { useAuth } from "../provider/AuthProvider";
 import Swal from "sweetalert2";
 
 const CheckoutForm = ({ price }) => {
@@ -29,10 +29,8 @@ const CheckoutForm = ({ price }) => {
         const { error, paymentMethod } = await stripe.createPaymentMethod({ type: 'card', card });
 
         if (error) {
-            console.log('Error', error);
             Swal.fire("Error", error.message, "error");
         } else {
-            // পেমেন্ট কনফার্ম করা
             const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(clientSecret, {
                 payment_method: {
                     card: card,
@@ -44,16 +42,16 @@ const CheckoutForm = ({ price }) => {
             });
 
             if (confirmError) {
-                console.log('Confirm Error');
+                Swal.fire("Error", confirmError.message, "error");
             } else if (paymentIntent.status === "succeeded") {
                 setTransactionId(paymentIntent.id);
                 
-                // ডাটাবেসে পেমেন্ট ডাটা সেভ করা
                 const paymentInfo = {
-                    email: user.email,
-                    price,
+                    name: user?.displayName,
+                    email: user?.email,
+                    price: parseFloat(price),
                     transactionId: paymentIntent.id,
-                    date: new Date(), // UTC date convert if needed
+                    date: new Date(), 
                     status: 'success'
                 };
 
@@ -82,7 +80,7 @@ const CheckoutForm = ({ price }) => {
             <button className="btn btn-error btn-block mt-6 text-white" type="submit" disabled={!stripe || !clientSecret}>
                 Donate ${price}
             </button>
-            {transactionId && <p className="text-green-600 mt-2">Your Transaction ID: {transactionId}</p>}
+            {transactionId && <p className="text-green-600 mt-2 font-medium text-center">Your Transaction ID: {transactionId}</p>}
         </form>
     );
 };
