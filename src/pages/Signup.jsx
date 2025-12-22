@@ -75,7 +75,7 @@ const Signup = () => {
           status: "active", 
         };
 
-        const dbRes = await axios.post('https://blood-donation-backentd-11.vercel.app//users', userInfo);
+        const dbRes = await axios.post('https://blood-donation-backentd-11.vercel.appusers', userInfo);
 
         if(dbRes.data.insertedId){
             console.log("User saved to database");

@@ -7,7 +7,7 @@ const Blog = () => {
 
     useEffect(() => {
         
-        axios.get('https://blood-donation-backentd-11.vercel.app//all-blogs')
+        axios.get('https://blood-donation-backentd-11.vercel.appall-blogs')
             .then(res => {
                 setBlogs(res.data);
                 setLoading(false);

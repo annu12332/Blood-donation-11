@@ -9,14 +9,14 @@ const ContentManagement = () => {
     const { data: blogs = [], refetch } = useQuery({
         queryKey: ['blogs'],
         queryFn: async () => {
-            const res = await axios.get('https://blood-donation-backentd-11.vercel.app//all-blogs');
+            const res = await axios.get('https://blood-donation-backentd-11.vercel.appall-blogs');
             return res.data;
         }
     });
 
     const handleStatusChange = async (id, status) => {
         const newStatus = status === 'draft' ? 'published' : 'draft';
-        await axios.patch(`https://blood-donation-backentd-11.vercel.app//blogs/${id}`, { status: newStatus });
+        await axios.patch(`https://blood-donation-backentd-11.vercel.appblogs/${id}`, { status: newStatus });
         refetch();
     };
 
