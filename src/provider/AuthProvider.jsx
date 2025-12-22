@@ -46,22 +46,24 @@ const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       
       if (currentUser) {
-        const userInfo = { email: currentUser.email };
-        axios.post('https://blood-donation-backentd-11.vercel.app//jwt', userInfo)
-          .then(res => {
-            if (res.data.token) {
-              localStorage.setItem('access-token', res.data.token);
-              setLoading(false); 
-            }
-          })
-          .catch(err => {
-            console.error("JWT Error:", err);
-            setLoading(false);
-          });
+        try {
+          // ফায়ারবেস থেকে সরাসরি টোকেন নেওয়া হচ্ছে
+          const token = await currentUser.getIdToken();
+          localStorage.setItem('access-token', token);
+          
+          // ব্যাকএন্ডে ইউজার ইনফো আপডেট রাখার জন্য রিকোয়েস্ট (স্ল্যাশ ফিক্স করা হয়েছে)
+          const userInfo = { email: currentUser.email };
+          await axios.post('https://blood-donation-backentd-11.vercel.app/jwt', userInfo);
+          
+          setLoading(false);
+        } catch (err) {
+          console.error("Token handling error:", err);
+          setLoading(false);
+        }
       } else {
         localStorage.removeItem('access-token');
         setLoading(false);
