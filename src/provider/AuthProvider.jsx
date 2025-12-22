@@ -55,7 +55,6 @@ const AuthProvider = ({ children }) => {
           const token = await currentUser.getIdToken();
           localStorage.setItem('access-token', token);
           
-          // ব্যাকএন্ডে ইউজার ইনফো আপডেট রাখার জন্য রিকোয়েস্ট (স্ল্যাশ ফিক্স করা হয়েছে)
           const userInfo = { email: currentUser.email };
           await axios.post('https://blood-donation-backentd-11.vercel.app/jwt', userInfo);
           
