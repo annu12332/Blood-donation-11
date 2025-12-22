@@ -3,7 +3,7 @@ import { Link } from "react-router";
 const Banner = () => {
     return (
         <div className="hero min-h-[550px]" style={{ backgroundImage: "url('https://ibb.co.com/j99T2wWt')" }}>
-            <div className="hero-overlay bg-opacity-70 bg-black"></div>
+            <div className="hero-overlay bg-opacity-70 bg-red-900"></div>
             <div className="hero-content text-center text-white">
                 <div className="max-w-2xl">
                     <h1 className="mb-5 text-5xl font-bold uppercase">Save a Life, Donate Blood</h1>

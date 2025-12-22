@@ -4,7 +4,8 @@ import { useAuth } from "../../provider/AuthProvider";
 import useRole from "../../hooks/UseRole";
 import {
     FaUser, FaHome, FaSignOutAlt, FaBars,
-    FaTimes, FaPlusCircle, FaList, FaUsers, FaTasks
+    FaTimes, FaPlusCircle, FaList, FaUsers, FaTasks, FaWallet,
+    FaHandHoldingHeart, FaHistory
 } from "react-icons/fa";
 
 const Sidebar = () => {
@@ -28,8 +29,6 @@ const Sidebar = () => {
     const navLinkClass = ({ isActive }) =>
         `flex items-center px-4 py-2 transition-colors duration-300 rounded-lg text-white ${isActive ? "bg-blue-700 font-bold" : "hover:bg-blue-800"
         }`;
-
-
 
     return (
         <>
@@ -74,6 +73,16 @@ const Sidebar = () => {
                                     <FaPlusCircle className="w-5 h-5" />
                                     <span className="mx-4 font-medium">Create Request</span>
                                 </NavLink>
+
+                                <NavLink to="/dashboard/funding" className={navLinkClass}>
+                                    <FaHandHoldingHeart className="w-5 h-5" />
+                                    <span className="mx-4 font-medium">Give Funding</span>
+                                </NavLink>
+
+                                <NavLink to="/dashboard/my-funding" className={navLinkClass}>
+                                    <FaHistory className="w-5 h-5" />
+                                    <span className="mx-4 font-medium">Funding History</span>
+                                </NavLink>
                             </>
                         )}
 
@@ -87,6 +96,13 @@ const Sidebar = () => {
                                     <FaTasks className="w-5 h-5" />
                                     <span className="mx-4 font-medium">Content Management</span>
                                 </NavLink>
+                                
+                                {role === 'admin' && (
+                                    <NavLink to="/dashboard/all-funding" className={navLinkClass}>
+                                        <FaWallet className="w-5 h-5" />
+                                        <span className="mx-4 font-medium">All Funding</span>
+                                    </NavLink>
+                                )}
                             </>
                         )}
 

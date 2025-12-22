@@ -22,6 +22,8 @@ import Blog from "../src/pages/Blog";
 import AllDonationRequests from "../src/pages/AllDonatonRequest";
 import UpdateDonationRequest from "../src/pages/UpdateDonationRequest";
 import Funding from "../src/pages/Funding";
+import MyFunding from "../src/pages/MyFunding";
+import AllFunding from "../src/pages/AllFunding";
 
 let router = createBrowserRouter([
   {
@@ -55,6 +57,10 @@ let router = createBrowserRouter([
       {
         path: "/blog",
         element: <Blog />
+      },
+      {
+        path: 'my-funding',
+        element: <MyFunding />
       }
     ],
   },
@@ -110,7 +116,15 @@ let router = createBrowserRouter([
       {
         path: 'funding',
         element: <Funding></Funding>
-      }
+      },
+      {
+        path: 'all-funding',
+        element: <AdminRoute><AllFunding /></AdminRoute>
+      },
+      {
+      path: "my-funding", 
+      element: <MyFunding />
+    },
 
     ],
   },

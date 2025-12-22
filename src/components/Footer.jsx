@@ -30,9 +30,9 @@ const Footer = () => {
                     <div>
                         <h3 className="text-lg font-bold text-white mb-4">Contact Info</h3>
                         <ul className="space-y-2 text-sm">
-                            <li>📍 Dhaka, Bangladesh</li>
-                            <li>📞 +880 1234 567 890</li>
-                            <li>📧 support@bloodlife.com</li>
+                            <li>Chattogram, Bangladesh</li>
+                            <li>📞 +880 1234567878</li>
+                            <li>📧 anas2542wy@gmail.com</li>
                             <li>⏰ 24/7 Emergency Service</li>
                         </ul>
                     </div>
@@ -61,7 +61,7 @@ const Footer = () => {
                 <div className="flex flex-col md:flex-row justify-between items-center text-sm">
                     <p>© {new Date().getFullYear()} BloodLife. All Rights Reserved.</p>
                     <p className="flex items-center gap-1 mt-2 md:mt-0">
-                        Made with <FaHeart className="text-red-600" /> by BloodLife Team
+                        Made with <FaHeart className="text-red-600" /> by Dev Anas
                     </p>
                 </div>
             </div>
