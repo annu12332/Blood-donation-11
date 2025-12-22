@@ -1,5 +1,5 @@
 import { useAuth } from "../provider/AuthProvider";
-import useRole from "../hooks/UseRole";
+import useRole from "../hooks/useRole";
 import { useEffect, useState } from "react";
 import useAxiosSecure from "../hooks/useAxiosSecure"; 
 import { Link } from "react-router";
