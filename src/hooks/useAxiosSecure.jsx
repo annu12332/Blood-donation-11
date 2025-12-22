@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { useAuth } from "../provider/AuthProvider"; 
 
 const axiosSecure = axios.create({
-    baseURL: 'http://localhost:5000'
+    baseURL: 'https://blood-donation-backentd-11.vercel.app/'
 });
 
 const useAxiosSecure = () => {

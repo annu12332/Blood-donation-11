@@ -9,7 +9,7 @@ const UpdateDonationRequest = () => {
     const [request, setRequest] = useState(null);
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/donation-details/${id}`)
+        axios.get(`https://blood-donation-backentd-11.vercel.app//donation-details/${id}`)
             .then(res => setRequest(res.data));
     }, [id]);
 
@@ -23,7 +23,7 @@ const UpdateDonationRequest = () => {
             status: form.status.value,
         };
 
-        const res = await axios.patch(`http://localhost:5000/update-request/${id}`, updatedData);
+        const res = await axios.patch(`https://blood-donation-backentd-11.vercel.app//update-request/${id}`, updatedData);
         if (res.data.modifiedCount > 0) {
             Swal.fire("Success!", "Request Updated Successfully", "success");
         }

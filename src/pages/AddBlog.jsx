@@ -15,7 +15,7 @@ const AddBlog = () => {
         };
 
         try {
-            await axios.post('http://localhost:5000/blogs', blogData);
+            await axios.post('https://blood-donation-backentd-11.vercel.app//blogs', blogData);
             navigate('/dashboard/content-management');
         } catch (error) {
             console.error(error);

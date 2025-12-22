@@ -17,7 +17,7 @@ const MyDonationRequests = () => {
 
   const fetchRequests = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/donation-requests/${user.email}`);
+      const res = await axios.get(`https://blood-donation-backentd-11.vercel.app//donation-requests/${user.email}`);
       setRequests(res.data);
     } catch (err) {
       console.error("Error fetching requests:", err);
@@ -36,7 +36,7 @@ const MyDonationRequests = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axios.delete(`http://localhost:5000/donation-requests/${id}`);
+          const res = await axios.delete(`https://blood-donation-backentd-11.vercel.app//donation-requests/${id}`);
           if (res.data.deletedCount > 0) {
             Swal.fire("Deleted!", "Your request has been deleted.", "success");
             setRequests(requests.filter((req) => req._id !== id));

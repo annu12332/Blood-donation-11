@@ -1,12 +1,12 @@
 import { useAuth } from "../../provider/AuthProvider";
-import useAxiosSecure from "../../hooks/useAxiosSecure"; // axios এর বদলে এটি ব্যবহার করুন
+import useAxiosSecure from "../../hooks/useAxiosSecure"; 
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router";
 
 const CreateDonationRequest = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const axiosSecure = useAxiosSecure(); // হুকটি কল করুন
+  const axiosSecure = useAxiosSecure();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,7 +28,6 @@ const CreateDonationRequest = () => {
     };
 
     try {
-      // axios.post এর বদলে axiosSecure.post ব্যবহার করুন
       const res = await axiosSecure.post("/donation-requests", requestData);
       
       if (res.data.insertedId) {
@@ -36,7 +35,7 @@ const CreateDonationRequest = () => {
         navigate("/dashboard/my-donation-requests");
       }
     } catch (error) {
-      // ৪০১ এরর হলে এখানে মেসেজ দেখাবে
+      
       const errorMsg = error.response?.status === 401 ? "Unauthorized! Please login again." : "Something went wrong!";
       toast.error(errorMsg);
       console.error("Error creating request:", error);
@@ -48,7 +47,6 @@ const CreateDonationRequest = () => {
       <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center uppercase tracking-wide">Create Blood Donation Request</h2>
       
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Requester Info (Read Only) */}
         <div className="form-control">
           <label className="label font-semibold">Requester Name</label>
           <input type="text" value={user?.displayName || ''} readOnly className="input input-bordered bg-gray-100" />
@@ -58,7 +56,6 @@ const CreateDonationRequest = () => {
           <input type="email" value={user?.email || ''} readOnly className="input input-bordered bg-gray-100" />
         </div>
 
-        {/* Recipient Info */}
         <div className="form-control">
           <label className="label font-semibold text-red-600">Recipient Name *</label>
           <input name="recipientName" type="text" placeholder="Enter recipient name" className="input input-bordered focus:border-red-500" required />
