@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { useAuth } from "../../provider/AuthProvider";
-import useRole from "../../hooks/UseRole";
+import useRole from "../../hooks/useRole";
 import {
     FaUser, FaHome, FaSignOutAlt, FaBars,
     FaTimes, FaPlusCircle, FaList, FaUsers, FaTasks, FaWallet,
