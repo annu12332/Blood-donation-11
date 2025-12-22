@@ -1,7 +1,7 @@
 import { useAuth } from "../provider/AuthProvider";
 import useRole from "../hooks/UseRole";
 import { useEffect, useState } from "react";
-import useAxiosSecure from "../hooks/useAxiosSecure"; // axios এর বদলে এটি ব্যবহার হবে
+import useAxiosSecure from "../hooks/useAxiosSecure"; 
 import { Link } from "react-router";
 import { FaEye, FaEdit, FaTrashAlt, FaUsers, FaHandHoldingHeart, FaCheckCircle } from "react-icons/fa";
 import Swal from "sweetalert2";
@@ -14,7 +14,6 @@ const DashboardHome = () => {
     const [stats, setStats] = useState({ users: 0, requests: 0, doneDonations: 0 });
 
     useEffect(() => {
-        // ১. ডোনারের জন্য রিসেন্ট রিকোয়েস্ট আনা
         if (user?.email && role === "donor") {
             axiosSecure
                 .get(`/donation-requests/recent/${user.email}`)
@@ -22,7 +21,6 @@ const DashboardHome = () => {
                 .catch((err) => console.error("Error fetching recent requests:", err));
         }
 
-        // ২. এডমিন বা ভলান্টিয়ারের জন্য স্ট্যাটাস আনা
         if (role === "admin" || role === "volunteer") {
             axiosSecure
                 .get('/admin-stats')
@@ -31,7 +29,6 @@ const DashboardHome = () => {
         }
     }, [user?.email, role, axiosSecure]);
 
-    // ডিলিট ফাংশনালিটি (ঐচ্ছিক কিন্তু ড্যাশবোর্ডের জন্য প্রয়োজন)
     const handleDelete = (id) => {
         Swal.fire({
             title: "Are you sure?",
@@ -52,7 +49,6 @@ const DashboardHome = () => {
 
     return (
         <div className="space-y-8 p-4">
-            {/* Welcome Header */}
             <div className="bg-white p-8 rounded-2xl shadow-sm border-l-8 border-red-600">
                 <h1 className="text-3xl font-bold text-gray-800">
                     Welcome, <span className="text-red-600">{user?.displayName}</span>! 👋
@@ -62,7 +58,6 @@ const DashboardHome = () => {
                 </p>
             </div>
 
-            {/* Donor View: Recent Requests Table */}
             {role === "donor" && (
                 <div className="bg-white p-6 rounded-2xl shadow-sm border">
                     <div className="flex justify-between items-center mb-6">
@@ -118,7 +113,6 @@ const DashboardHome = () => {
                 </div>
             )}
 
-            {/* Admin/Volunteer View: Dynamic Stats Cards */}
             {(role === "admin" || role === "volunteer") && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-white p-8 rounded-2xl border-b-4 border-red-500 shadow-md flex items-center justify-between">

@@ -1,4 +1,4 @@
-import { Link, NavLink, useNavigate } from "react-router"; // useNavigate যোগ করা হয়েছে
+import { Link, NavLink, useNavigate } from "react-router"; 
 import { useAuth } from "../provider/AuthProvider";
 
 const Navbar = () => {
