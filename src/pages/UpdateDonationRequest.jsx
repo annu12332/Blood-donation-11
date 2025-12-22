@@ -9,7 +9,7 @@ const UpdateDonationRequest = () => {
     const [request, setRequest] = useState(null);
 
     useEffect(() => {
-        axios.get(`https://blood-donation-backentd-11.vercel.appdonation-details/${id}`)
+        axios.get(`https://blood-donation-backentd-11.vercel.app/donation-details/${id}`)
             .then(res => setRequest(res.data));
     }, [id]);
 

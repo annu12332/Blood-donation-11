@@ -7,13 +7,13 @@ const AllUsers = () => {
     const { data: users = [], refetch } = useQuery({
         queryKey: ['users'],
         queryFn: async () => {
-            const res = await axios.get('https://blood-donation-backentd-11.vercel.appusers');
+            const res = await axios.get('https://blood-donation-backentd-11.vercel.app/users');
             return res.data;
         }
     });
 
     const handleRoleChange = async (id, newRole) => {
-        const res = await axios.patch(`https://blood-donation-backentd-11.vercel.appusers/role/${id}`, { role: newRole });
+        const res = await axios.patch(`https://blood-donation-backentd-11.vercel.app/users/role/${id}`, { role: newRole });
         if (res.data.modifiedCount > 0) {
             toast.success(`Role updated to ${newRole}`);
             refetch();
@@ -21,7 +21,7 @@ const AllUsers = () => {
     };
 
     const handleStatusChange = async (id, newStatus) => {
-        const res = await axios.patch(`https://blood-donation-backentd-11.vercel.appusers/status/${id}`, { status: newStatus });
+        const res = await axios.patch(`https://blood-donation-backentd-11.vercel.app/users/status/${id}`, { status: newStatus });
         if (res.data.modifiedCount > 0) {
             toast.success(`User is now ${newStatus}`);
             refetch();

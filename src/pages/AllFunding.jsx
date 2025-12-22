@@ -12,7 +12,6 @@ const AllFunding = () => {
         }
     });
 
-    // মোট ফান্ড ক্যালকুলেট করা
     const totalFund = allPayments.reduce((sum, item) => sum + parseFloat(item.price), 0);
 
     return (
