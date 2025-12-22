@@ -1,11 +1,12 @@
 import { useAuth } from "../../provider/AuthProvider";
-import axios from "axios";
+import useAxiosSecure from "../../hooks/useAxiosSecure"; // axios এর বদলে এটি ব্যবহার করুন
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router";
 
 const CreateDonationRequest = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const axiosSecure = useAxiosSecure(); // হুকটি কল করুন
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,41 +28,46 @@ const CreateDonationRequest = () => {
     };
 
     try {
-      const res = await axios.post("http://localhost:5000/donation-requests", requestData);
+      // axios.post এর বদলে axiosSecure.post ব্যবহার করুন
+      const res = await axiosSecure.post("/donation-requests", requestData);
+      
       if (res.data.insertedId) {
         toast.success("Donation request created successfully!");
         navigate("/dashboard/my-donation-requests");
       }
     } catch (error) {
-      toast.error("Something went wrong!");
+      // ৪০১ এরর হলে এখানে মেসেজ দেখাবে
+      const errorMsg = error.response?.status === 401 ? "Unauthorized! Please login again." : "Something went wrong!";
+      toast.error(errorMsg);
+      console.error("Error creating request:", error);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-md border border-gray-100">
-      <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Create Blood Donation Request</h2>
+    <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-md border border-gray-100 my-10">
+      <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center uppercase tracking-wide">Create Blood Donation Request</h2>
       
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-       
+        {/* Requester Info (Read Only) */}
         <div className="form-control">
           <label className="label font-semibold">Requester Name</label>
-          <input type="text" value={user?.displayName} readOnly className="input input-bordered bg-gray-100" />
+          <input type="text" value={user?.displayName || ''} readOnly className="input input-bordered bg-gray-100" />
         </div>
         <div className="form-control">
           <label className="label font-semibold">Requester Email</label>
-          <input type="email" value={user?.email} readOnly className="input input-bordered bg-gray-100" />
+          <input type="email" value={user?.email || ''} readOnly className="input input-bordered bg-gray-100" />
         </div>
 
         {/* Recipient Info */}
         <div className="form-control">
           <label className="label font-semibold text-red-600">Recipient Name *</label>
-          <input name="recipientName" type="text" placeholder="Enter recipient name" className="input input-bordered" required />
+          <input name="recipientName" type="text" placeholder="Enter recipient name" className="input input-bordered focus:border-red-500" required />
         </div>
 
         <div className="form-control">
           <label className="label font-semibold text-red-600">Blood Group *</label>
-          <select name="bloodGroup" className="select select-bordered" required>
-            <option value= "" disabled selected>Select Blood Group</option>
+          <select name="bloodGroup" className="select select-bordered" defaultValue="" required>
+            <option value="" disabled>Select Blood Group</option>
             <option value="A+">A+</option>
             <option value="A-">A-</option>
             <option value="B+">B+</option>
@@ -74,12 +80,12 @@ const CreateDonationRequest = () => {
         </div>
 
         <div className="form-control">
-          <label className="label font-semibold">District</label>
+          <label className="label font-semibold text-red-600">District *</label>
           <input name="district" type="text" placeholder="e.g. Dhaka" className="input input-bordered" required />
         </div>
 
         <div className="form-control">
-          <label className="label font-semibold">Upazila</label>
+          <label className="label font-semibold text-red-600">Upazila *</label>
           <input name="upazila" type="text" placeholder="e.g. Dhanmondi" className="input input-bordered" required />
         </div>
 
@@ -94,18 +100,24 @@ const CreateDonationRequest = () => {
         </div>
 
         <div className="form-control md:col-span-2">
-          <label className="label font-semibold">Hospital Name & Full Address</label>
-          <input name="hospitalName" type="text" placeholder="e.g. Dhaka Medical College Hospital" className="input input-bordered mb-2" required />
-          <textarea name="fullAddress" className="textarea textarea-bordered h-24" placeholder="Full address details..."></textarea>
+          <label className="label font-semibold text-red-600">Hospital Name *</label>
+          <input name="hospitalName" type="text" placeholder="e.g. Dhaka Medical College Hospital" className="input input-bordered" required />
         </div>
 
         <div className="form-control md:col-span-2">
-          <label className="label font-semibold">Request Message</label>
-          <textarea name="requestMessage" className="textarea textarea-bordered h-24" placeholder="Explain why you need blood..."></textarea>
+          <label className="label font-semibold text-red-600">Full Address *</label>
+          <textarea name="fullAddress" className="textarea textarea-bordered h-24" placeholder="House, Road, Area details..." required></textarea>
+        </div>
+
+        <div className="form-control md:col-span-2">
+          <label className="label font-semibold">Request Message (Optional)</label>
+          <textarea name="requestMessage" className="textarea textarea-bordered h-24" placeholder="Briefly explain the emergency..."></textarea>
         </div>
 
         <div className="md:col-span-2 mt-4">
-          <button type="submit" className="btn btn-error w-full text-white text-lg">Request Donation</button>
+          <button type="submit" className="btn btn-error w-full text-white text-lg font-bold shadow-lg">
+            Submit Donation Request
+          </button>
         </div>
       </form>
     </div>

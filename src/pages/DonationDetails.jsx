@@ -1,108 +1,105 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
-import axios from "axios";
-import { useAuth } from "../provider/AuthProvider"; // { useAuth } কার্লি ব্রেস যোগ করা হয়েছে
+import useAxiosSecure from "../hooks/useAxiosSecure";
+import { useAuth } from "../provider/AuthProvider";
 import Swal from "sweetalert2";
 
 const DonationDetails = () => {
     const { id } = useParams();
-    const { user } = useAuth(); // এখন এটি সঠিকভাবে কাজ করবে
-    const [donation, setDonation] = useState(null);
+    const { user } = useAuth();
+    const axiosSecure = useAxiosSecure();
 
-    useEffect(() => {
-        // API কল করার সময় আইডি ভ্যালিড কিনা তা নিশ্চিত হওয়া ভালো
-        if (id) {
-            axios.get(`http://localhost:5000/donation-request-details/${id}`)
-                .then(res => setDonation(res.data))
-                .catch(err => console.error("Error fetching details:", err));
+    const { data: request = {}, refetch, isLoading } = useQuery({
+        queryKey: ['donation-request', id],
+        queryFn: async () => {
+            const res = await axiosSecure.get(`/donation-request-details/${id}`);
+            return res.data;
         }
-    }, [id]);
+    });
 
-    const handleDonate = async (e) => {
+    const handleConfirmDonate = async (e) => {
         e.preventDefault();
-        
-        // লগইন করা ইউজার না থাকলে ডোনেট করতে বাধা দিন
-        if (!user) {
-            return Swal.fire("Error", "Please login to donate", "error");
-        }
 
-        const donationUpdate = {
+        const donorInfo = {
             donorName: user?.displayName,
             donorEmail: user?.email,
             status: 'inprogress'
         };
 
         try {
-            const res = await axios.patch(`http://localhost:5000/donation-requests/donate/${id}`, donationUpdate);
+            const res = await axiosSecure.patch(`/donation-requests/status/${id}`, donorInfo);
             if (res.data.modifiedCount > 0) {
-                Swal.fire("Success!", "Thank you for volunteering to donate!", "success");
-                setDonation({ ...donation, ...donationUpdate });
-                document.getElementById('donate-modal').close();
+                Swal.fire({
+                    title: "Success!",
+                    text: "You have successfully volunteered for this request.",
+                    icon: "success"
+                });
+                document.getElementById('donation_modal').close();
+                refetch();
             }
         } catch (error) {
-            Swal.fire("Error", "Something went wrong while updating status", "error");
+            Swal.fire("Error", "Something went wrong!", "error");
         }
     };
 
-    if (!donation) return <div className="text-center py-20 text-2xl font-semibold">Loading Donation Details...</div>;
+    if (isLoading) return <div className="text-center py-20"><span className="loading loading-spinner loading-lg"></span></div>;
 
     return (
-        <div className="max-w-4xl mx-auto my-10 p-6 bg-white shadow-xl rounded-2xl border border-gray-100">
-            
-            <h2 className="text-3xl font-bold text-red-600 mb-6 text-center">Donation Request Details</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-lg">
-                <p><strong>Recipient Name:</strong> {donation.recipientName}</p>
-                <p><strong>Blood Group:</strong> <span className="badge badge-error text-white font-bold p-3">{donation.bloodGroup}</span></p>
-                <p><strong>District:</strong> {donation.district}</p>
-                <p><strong>Upazila:</strong> {donation.upazila}</p>
-                <p><strong>Hospital:</strong> {donation.hospitalName}</p>
-                <p><strong>Full Address:</strong> {donation.fullAddress}</p>
-                <p><strong>Date:</strong> {donation.donationDate}</p>
-                <p><strong>Time:</strong> {donation.donationTime}</p>
-            </div>
+        <div className="container mx-auto px-4 py-12">
+            <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-3xl overflow-hidden border border-gray-100">
+                <div className="bg-red-600 p-8 text-white text-center">
+                    <h2 className="text-3xl font-bold uppercase tracking-wide">Donation Request Details</h2>
+                </div>
 
-            <div className="mt-8 p-4 bg-gray-50 rounded-lg border-l-4 border-red-500">
-                <p className="font-medium text-gray-700 italic">" {donation.requestMessage || 'No message provided.'} "</p>
-            </div>
-
-            <div className="mt-10 text-center">
-                {donation.status === 'pending' ? (
-                    <button 
-                        onClick={() => document.getElementById('donate-modal').showModal()}
-                        className="btn btn-error text-white px-10 hover:bg-red-700 transition-colors"
-                    >
-                        Donate Now
-                    </button>
-                ) : (
-                    <div className="badge badge-lg badge-outline badge-info p-6 font-semibold">
-                        Status: Already In Progress by {donation.donorName || 'a donor'}
+                <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-4">
+                        <p className="text-lg"><strong>Recipient Name:</strong> {request.recipientName}</p>
+                        <p className="text-lg"><strong>Blood Group:</strong> <span className="badge badge-error text-white font-bold p-3">{request.bloodGroup}</span></p>
+                        <p className="text-lg"><strong>Location:</strong> {request.upazila}, {request.district}</p>
+                        <p className="text-lg"><strong>Hospital:</strong> {request.hospitalName}</p>
                     </div>
-                )}
+                    <div className="space-y-4 border-l pl-8 border-gray-100">
+                        <p className="text-lg"><strong>Date:</strong> {request.donationDate}</p>
+                        <p className="text-lg"><strong>Time:</strong> {request.donationTime}</p>
+                        <p className="text-lg"><strong>Full Address:</strong> {request.fullAddress}</p>
+                        <p className="text-lg italic text-gray-500"><strong>Message:</strong> {request.requestMessage}</p>
+                    </div>
+                </div>
+
+                <div className="p-8 bg-gray-50 flex justify-center">
+                    {request.status === 'pending' ? (
+                        <button 
+                            onClick={() => document.getElementById('donation_modal').showModal()}
+                            className="btn btn-error btn-lg px-12 text-white font-bold"
+                        >
+                            Donate Now
+                        </button>
+                    ) : (
+                        <div className="alert alert-info">
+                            <span>This request is currently <strong>{request.status}</strong> by {request.donorName}</span>
+                        </div>
+                    )}
+                </div>
             </div>
 
-            {/* Modal - DaisyUI */}
-            <dialog id="donate-modal" className="modal modal-bottom sm:modal-middle">
+            {/* Confirmation Modal */}
+            <dialog id="donation_modal" className="modal modal-bottom sm:modal-middle">
                 <div className="modal-box">
-                    <h3 className="font-bold text-xl mb-4 text-center text-red-600">Confirm Your Donation</h3>
-                    <form onSubmit={handleDonate} className="space-y-4">
+                    <h3 className="font-bold text-2xl text-red-600 text-center mb-6">Confirm Your Donation</h3>
+                    <form onSubmit={handleConfirmDonate} className="space-y-4">
                         <div className="form-control">
-                            <label className="label text-sm font-semibold text-gray-600">Your Name</label>
+                            <label className="label font-semibold">Donor Name</label>
                             <input type="text" defaultValue={user?.displayName} readOnly className="input input-bordered bg-gray-100" />
                         </div>
                         <div className="form-control">
-                            <label className="label text-sm font-semibold text-gray-600">Your Email</label>
-                            <input type="email" defaultValue={user?.email} readOnly className="input input-bordered bg-gray-100" />
+                            <label className="label font-semibold">Donor Email</label>
+                            <input type="text" defaultValue={user?.email} readOnly className="input input-bordered bg-gray-100" />
                         </div>
-                        <div className="modal-action flex justify-center mt-6">
-                            <button type="submit" className="btn btn-success text-white w-full max-w-xs">Confirm Donation</button>
+                        <div className="modal-action flex justify-center gap-4">
+                            <button type="submit" className="btn btn-error text-white px-8">Confirm Donation</button>
+                            <button type="button" onClick={() => document.getElementById('donation_modal').close()} className="btn">Cancel</button>
                         </div>
                     </form>
-                    <div className="modal-action">
-                        <form method="dialog">
-                            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                        </form>
-                    </div>
                 </div>
             </dialog>
         </div>
