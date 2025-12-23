@@ -46,7 +46,7 @@ const DonationRequests = () => {
                         <p className="text-gray-500 mt-2">Check back later or share the portal with others.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div  className="grid animate-pulse grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {requests.map(request => (
                             <div key={request._id} className="card bg-white shadow-lg hover:shadow-2xl transition-all duration-300 border-t-8 border-red-600">
                                 <div className="card-body">
