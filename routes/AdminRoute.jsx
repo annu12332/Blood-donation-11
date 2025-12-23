@@ -15,11 +15,9 @@ const AdminRoute = ({ children }) => {
         );
     }
 
-    if (user && role === "admin") {
+    if (user && (role === "admin" || role === "volunteer")) {
         return children;
     }
 
     return <Navigate to="/" state={{ from: location }} replace />;
 };
-
-export default AdminRoute;
