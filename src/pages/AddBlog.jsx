@@ -1,8 +1,9 @@
-import axios from "axios";
 import { useNavigate } from "react-router";
+import useAxiosSecure from "../hooks/useAxiosSecure"; 
 
 const AddBlog = () => {
     const navigate = useNavigate();
+    const axiosSecure = useAxiosSecure(); 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -15,10 +16,11 @@ const AddBlog = () => {
         };
 
         try {
-            await axios.post('https://blood-donation-backentd-11.vercel.app/blogs', blogData);
+            await axiosSecure.post('/blogs', blogData); 
+            
             navigate('/dashboard/content-management');
         } catch (error) {
-            console.error(error);
+            console.error("Error creating blog:", error.response?.data || error.message);
         }
     };
 
