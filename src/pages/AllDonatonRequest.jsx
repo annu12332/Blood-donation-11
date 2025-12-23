@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import useAxiosSecure from "../hooks/useAxiosSecure"; 
 import { Link } from "react-router";
 import { toast } from "react-hot-toast";
+import FadeInUp from "../components/FadeInUp";
 
 const AllDonationRequest = () => {
     const [requests, setRequests] = useState([]);
@@ -37,7 +38,8 @@ const AllDonationRequest = () => {
     if (loading) return <div className="flex justify-center py-20"><span className="loading loading-spinner loading-lg text-red-600"></span></div>;
 
     return (
-        <div className="p-6 bg-white rounded-lg shadow-sm">
+       <FadeInUp>
+         <div className="p-6 bg-white rounded-lg shadow-sm">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">All Donation Requests</h2>
                 <div className="badge badge-error text-white p-4">Total: {requests.length}</div>
@@ -106,6 +108,7 @@ const AllDonationRequest = () => {
                 <p className="text-center py-10 text-gray-500">No requests found in the database.</p>
             )}
         </div>
+       </FadeInUp>
     );
 };
 

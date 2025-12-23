@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
-import { getAuth } from "../../provider/AuthProvider";
+import { getAuth } from "firebase/auth";
+import { useAuth } from "../../provider/AuthProvider";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -198,3 +199,4 @@ const EditDonationRequest = () => {
 };
 
 export default EditDonationRequest;
+
