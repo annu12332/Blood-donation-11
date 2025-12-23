@@ -8,10 +8,9 @@ const DonationRequests = () => {
     const axiosPublic = useAxiosPublic();
 
     useEffect(() => {
-        axiosPublic.get('/all-donation-requests')
+        axiosPublic.get('/pending-donation-requests')
             .then(res => {
-                const pendingData = res.data.filter(request => request.status === 'pending');
-                setRequests(pendingData);
+                setRequests(res.data);
                 setLoading(false);
             })
             .catch(err => {
@@ -35,7 +34,7 @@ const DonationRequests = () => {
                     Available Donation Requests
                 </h2>
                 <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-                    নিচের তালিকা থেকে জরুরি পেন্ডিং রিকোয়েস্টগুলো দেখে রক্ত দিয়ে প্রাণ বাঁচাতে এগিয়ে আসুন।
+                    নিচের তালিকা থেকে জরুরি পেন্ডিং রিকোয়েস্টগুলো দেখে রক্ত দিয়ে প্রাণ বাঁচাতে এগিয়ে আসুন।
                 </p>
                 
                 {requests.length === 0 ? (
@@ -46,7 +45,7 @@ const DonationRequests = () => {
                         <p className="text-gray-500 mt-2">Check back later or share the portal with others.</p>
                     </div>
                 ) : (
-                    <div  className="grid animate-pulse grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {requests.map(request => (
                             <div key={request._id} className="card bg-white shadow-lg hover:shadow-2xl transition-all duration-300 border-t-8 border-red-600">
                                 <div className="card-body">

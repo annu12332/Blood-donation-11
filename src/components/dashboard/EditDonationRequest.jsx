@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { getAuth } from "firebase/auth";
-import { useAuth } from "../../provider/AuthProvider";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -25,8 +24,14 @@ const EditDonationRequest = () => {
   useEffect(() => {
     const getRequestDetails = async () => {
       try {
+        const token = await auth.currentUser?.getIdToken();
         const res = await axios.get(
-          `https://blood-donation-backentd-11.vercel.app/donation-request-details/${id}`
+          `https://blood-donation-backentd-11.vercel.app/donation-request-details/${id}`,
+          {
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+          }
         );
         setRequestData(res.data);
         setLoading(false);
@@ -35,8 +40,10 @@ const EditDonationRequest = () => {
         setLoading(false);
       }
     };
-    getRequestDetails();
-  }, [id]);
+    if (auth.currentUser) {
+      getRequestDetails();
+    }
+  }, [id, auth.currentUser]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -199,4 +206,3 @@ const EditDonationRequest = () => {
 };
 
 export default EditDonationRequest;
-

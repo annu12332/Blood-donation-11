@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { useAuth } from "../provider/AuthProvider"; 
+import { getAuth } from "firebase/auth";
 
 const axiosSecure = axios.create({
     baseURL: 'https://blood-donation-backentd-11.vercel.app'
@@ -9,10 +10,12 @@ const axiosSecure = axios.create({
 const useAxiosSecure = () => {
     const navigate = useNavigate();
     const { logout } = useAuth(); 
+    const auth = getAuth();
 
-    axiosSecure.interceptors.request.use(function (config) {
-        const token = localStorage.getItem('access-token');
-        if (token) {
+    axiosSecure.interceptors.request.use(async function (config) {
+        const user = auth.currentUser;
+        if (user) {
+            const token = await user.getIdToken();
             config.headers.authorization = `Bearer ${token}`;
         }
         return config;
