@@ -39,7 +39,8 @@ const AllDonationRequest = () => {
 
     return (
        <FadeInUp>
-         <div className="p-6 bg-white rounded-lg shadow-sm">
+        <div data-aos="zoom-out-up">
+             <div className="p-6 bg-white rounded-lg shadow-sm">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">All Donation Requests</h2>
                 <div className="badge badge-error text-white p-4">Total: {requests.length}</div>
@@ -108,6 +109,8 @@ const AllDonationRequest = () => {
                 <p className="text-center py-10 text-gray-500">No requests found in the database.</p>
             )}
         </div>
+        </div>
+        
        </FadeInUp>
     );
 };

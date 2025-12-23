@@ -1,23 +1,30 @@
 import { Link } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import useRole from "../hooks/useRole";
+import useAxiosSecure from "../hooks/useAxiosSecure"; 
 
 const ContentManagement = () => {
     const [role] = useRole();
+    const axiosSecure = useAxiosSecure(); 
     
     const { data: blogs = [], refetch } = useQuery({
         queryKey: ['blogs'],
         queryFn: async () => {
-            const res = await axios.get('https://blood-donation-backentd-11.vercel.app/all-blogs');
+            
+            const res = await axiosSecure.get('/all-blogs');
             return res.data;
         }
     });
 
     const handleStatusChange = async (id, status) => {
         const newStatus = status === 'draft' ? 'published' : 'draft';
-        await axios.patch(`https://blood-donation-backentd-11.vercel.app/blogs/${id}`, { status: newStatus });
-        refetch();
+        try {
+           
+            await axiosSecure.patch(`/blogs/${id}`, { status: newStatus });
+            refetch();
+        } catch (error) {
+            console.error("Status update failed:", error.response?.data || error.message);
+        }
     };
 
     return (
@@ -40,7 +47,7 @@ const ContentManagement = () => {
                                 </span>
                                 
                                 <div className="flex gap-2">
-                                    {role === 'admin' && (
+                                    {(role === 'admin' || role === 'volunteer') && ( 
                                         <button 
                                             onClick={() => handleStatusChange(blog._id, blog.status)}
                                             className="btn btn-xs btn-outline"
