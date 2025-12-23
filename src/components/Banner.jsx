@@ -1,9 +1,11 @@
 import { Link } from "react-router";
 import FadeInUp from "./FadeInUp";
+import MotionWrapper from "./MotionWraper";
 
 const Banner = () => {
     return (
-        <div className="hero min-h-[550px]" style={{ backgroundImage: "url('https://ibb.co.com/j99T2wWt')" }}>
+      <MotionWrapper>
+         <div className="hero min-h-[550px]" style={{ backgroundImage: "url('https://ibb.co.com/j99T2wWt')" }}>
             <div className="hero-overlay bg-opacity-70 bg-red-900"></div>
             <div className="hero-content text-center text-white">
                 <div className="max-w-2xl">
@@ -16,6 +18,7 @@ const Banner = () => {
                 </div>
             </div>
         </div>
+      </MotionWrapper>
     );
 };
 
