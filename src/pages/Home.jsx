@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router"; 
+import { Link } from "react-router";
 import useAxiosPublic from "../hooks/useAxiosPublic";
 import Banner from "../components/Banner";
 import ContactUs from "../components/ContactUs";
@@ -11,7 +11,7 @@ const Home = () => {
     const axiosPublic = useAxiosPublic();
 
     useEffect(() => {
-        axiosPublic.get('/featured-blogs') 
+        axiosPublic.get('/featured-blogs')
             .then(res => setBlogs(res.data))
             .catch(err => console.error("Blog fetch error:", err));
 
@@ -23,29 +23,37 @@ const Home = () => {
     return (
         <div>
             <Banner />
-            
-            <div className="py-16 bg-white">
-                <div className="container mx-auto px-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                        <div className="p-10 bg-red-50 rounded-2xl shadow-sm border-t-4 border-red-500">
-                            <h3 className="text-4xl font-bold text-red-600 mb-2">{stats.users}</h3>
-                            <p className="text-gray-700 font-semibold uppercase tracking-wider">Registered Donors</p>
-                        </div>
-                        <div className="p-10 bg-red-50 rounded-2xl shadow-sm border-t-4 border-red-500">
-                            <h3 className="text-4xl font-bold text-red-600 mb-2">{stats.requests}</h3>
-                            <p className="text-gray-700 font-semibold uppercase tracking-wider">Total Requests</p>
-                        </div>
-                        <div className="p-10 bg-red-50 rounded-2xl shadow-sm border-t-4 border-red-500">
-                            <h3 className="text-4xl font-bold text-red-600 mb-2">{stats.doneDonations}</h3>
-                            <p className="text-gray-700 font-semibold uppercase tracking-wider">Happy Survivors</p>
+            <div data-aos="flip-left"
+                data-aos-easing="ease-out-cubic"
+                data-aos-duration="2000">
+
+                <div className="py-16 bg-white">
+                    <div className="container mx-auto px-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                            <div className="p-10 bg-red-50 rounded-2xl shadow-sm border-t-4 border-red-500">
+                                <h3 className="text-4xl font-bold text-red-600 mb-2">{stats.users}</h3>
+                                <p className="text-gray-700 font-semibold uppercase tracking-wider">Registered Donors</p>
+                            </div>
+                            <div className="p-10 bg-red-50 rounded-2xl shadow-sm border-t-4 border-red-500">
+                                <h3 className="text-4xl font-bold text-red-600 mb-2">{stats.requests}</h3>
+                                <p className="text-gray-700 font-semibold uppercase tracking-wider">Total Requests</p>
+                            </div>
+                            <div className="p-10 bg-red-50 rounded-2xl shadow-sm border-t-4 border-red-500">
+                                <h3 className="text-4xl font-bold text-red-600 mb-2">{stats.doneDonations}</h3>
+                                <p className="text-gray-700 font-semibold uppercase tracking-wider">Happy Survivors</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+
             <div className="py-20 bg-gray-50 text-center px-4">
                 <h2 className="text-3xl font-bold mb-10 text-gray-800 uppercase tracking-widest">Our Features</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 container mx-auto">
+
+                <div data-aos="zoom-out-down">
+
+                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 container mx-auto">
                     <div className="p-8 bg-white shadow-md rounded-lg border-b-4 border-red-500 hover:scale-105 transition-transform group">
                         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-red-500 transition-colors">
                             <svg className="w-8 h-8 text-red-600 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -68,6 +76,8 @@ const Home = () => {
                         <p className="text-gray-600 font-medium">আপনার ব্যক্তিগত তথ্য আমাদের কাছে সুরক্ষিত।</p>
                     </div>
                 </div>
+                </div>
+               
             </div>
 
             {blogs.length > 0 && (
@@ -102,7 +112,7 @@ const Home = () => {
             )}
 
             <ContactUs />
-            <Footer/>
+            <Footer />
         </div>
     );
 };
