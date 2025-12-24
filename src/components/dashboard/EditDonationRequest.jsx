@@ -25,6 +25,9 @@ const EditDonationRequest = () => {
     const getRequestDetails = async () => {
       try {
         const token = await auth.currentUser?.getIdToken();
+        
+        if (!token) return; 
+
         const res = await axios.get(
           `https://blood-donation-backentd-11.vercel.app/donation-request-details/${id}`,
           {
@@ -36,14 +39,19 @@ const EditDonationRequest = () => {
         setRequestData(res.data);
         setLoading(false);
       } catch (error) {
-        console.error(error);
+        console.error("Fetch Error:", error);
         setLoading(false);
       }
     };
-    if (auth.currentUser) {
-      getRequestDetails();
-    }
-  }, [id, auth.currentUser]);
+
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+        if (user) {
+            getRequestDetails();
+        }
+    });
+
+    return () => unsubscribe();
+  }, [id, auth]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -80,8 +88,11 @@ const EditDonationRequest = () => {
           timer: 1500,
         });
         navigate("/dashboard/my-donation-requests");
+      } else {
+        Swal.fire("Info", "No changes were made", "info");
       }
     } catch (error) {
+      console.error("Update Error:", error);
       Swal.fire("Error", "Something went wrong!", "error");
     }
   };
@@ -99,7 +110,7 @@ const EditDonationRequest = () => {
           <input
             name="recipientName"
             type="text"
-            defaultValue={requestData.recipientName}
+            defaultValue={requestData?.recipientName}
             className="input input-bordered w-full"
             required
           />
@@ -107,7 +118,13 @@ const EditDonationRequest = () => {
 
         <div className="form-control">
           <label className="label">Blood Group</label>
-          <select name="bloodGroup" defaultValue={requestData.bloodGroup} className="select select-bordered w-full" required>
+          <select 
+            name="bloodGroup" 
+            defaultValue={requestData?.bloodGroup} 
+            className="select select-bordered w-full" 
+            required
+          >
+            <option disabled value="">Select Blood Group</option>
             <option value="A+">A+</option>
             <option value="A-">A-</option>
             <option value="B+">B+</option>
@@ -124,7 +141,7 @@ const EditDonationRequest = () => {
           <input
             name="district"
             type="text"
-            defaultValue={requestData.district}
+            defaultValue={requestData?.district}
             className="input input-bordered w-full"
             required
           />
@@ -135,7 +152,7 @@ const EditDonationRequest = () => {
           <input
             name="upazila"
             type="text"
-            defaultValue={requestData.upazila}
+            defaultValue={requestData?.upazila}
             className="input input-bordered w-full"
             required
           />
@@ -146,7 +163,7 @@ const EditDonationRequest = () => {
           <input
             name="hospitalName"
             type="text"
-            defaultValue={requestData.hospitalName}
+            defaultValue={requestData?.hospitalName}
             className="input input-bordered w-full"
             required
           />
@@ -157,7 +174,7 @@ const EditDonationRequest = () => {
           <input
             name="fullAddress"
             type="text"
-            defaultValue={requestData.fullAddress}
+            defaultValue={requestData?.fullAddress}
             className="input input-bordered w-full"
             required
           />
@@ -168,7 +185,7 @@ const EditDonationRequest = () => {
           <input
             name="donationDate"
             type="date"
-            defaultValue={requestData.donationDate}
+            defaultValue={requestData?.donationDate}
             className="input input-bordered w-full"
             required
           />
@@ -179,7 +196,7 @@ const EditDonationRequest = () => {
           <input
             name="donationTime"
             type="time"
-            defaultValue={requestData.donationTime}
+            defaultValue={requestData?.donationTime}
             className="input input-bordered w-full"
             required
           />
@@ -189,7 +206,7 @@ const EditDonationRequest = () => {
           <label className="label">Description / Why needed?</label>
           <textarea
             name="description"
-            defaultValue={requestData.description}
+            defaultValue={requestData?.description}
             className="textarea textarea-bordered h-24"
             required
           ></textarea>

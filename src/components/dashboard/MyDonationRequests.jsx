@@ -12,18 +12,19 @@ const MyDonationRequests = () => {
     useEffect(() => {
         if (user?.email) {
             axiosSecure.get(`/donation-requests/${user.email}`)
-                .then(res => setRequests(res.data))
+                .then(res => {
+                    setRequests(res.data);
+                })
                 .catch(err => {
                     console.error("Error fetching requests:", err);
                     toast.error("Failed to fetch requests");
                 });
         }
-    }, [user, axiosSecure]);
+    }, [user?.email, axiosSecure]); 
 
     const handleDelete = async (id) => {
         if (window.confirm("Are you sure you want to delete this?")) {
             try {
-                // এখানেও axiosSecure ব্যবহার করুন
                 const res = await axiosSecure.delete(`/donation-requests/${id}`);
                 if (res.data.deletedCount > 0) {
                     toast.success("Deleted successfully");
